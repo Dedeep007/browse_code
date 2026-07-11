@@ -17,10 +17,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveBtn.addEventListener('click', () => {
         const path = dirInput.value.trim();
-        let injectN = 5;
+        let injectN = 10;
         if (injectNInput) {
             injectN = parseInt(injectNInput.value, 10);
-            if (isNaN(injectN)) injectN = 5;
+            if (isNaN(injectN)) injectN = 10;
         }
         chrome.storage.local.set({ workspaceDir: path, injectN: injectN });
         syncWithServer(path);

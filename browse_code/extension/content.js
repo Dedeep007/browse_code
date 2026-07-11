@@ -152,7 +152,7 @@ When the task is fully done and you have real tool results confirming every chan
 To confirm you understand these instructions, reply ONLY with: "Agent Initialized. Awaiting command."`;
 
 let messageCount = 0;
-let injectN = 5;
+let injectN = 10;
 
 chrome.storage.local.get(['injectN'], (res) => {
     if (res.injectN !== undefined) injectN = parseInt(res.injectN, 10);
