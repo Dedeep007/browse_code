@@ -189,7 +189,11 @@ def cleanup_background_processes():
     for pid, data in BACKGROUND_PROCESSES.items():
         if data['status'] == 'running':
             try:
-                data['process'].terminate()
+                proc = data['process']
+                if platform.system() == "Windows":
+                    subprocess.run(f"taskkill /F /T /PID {proc.pid}", shell=True, capture_output=True)
+                else:
+                    proc.terminate()
             except:
                 pass
 

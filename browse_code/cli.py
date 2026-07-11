@@ -206,6 +206,15 @@ def main():
         from server import app
 
     import uvicorn
+    import sys
+    import asyncio
+    
+    if sys.platform == "win32":
+        try:
+            asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+        except Exception:
+            pass
+
     uvicorn.run(app, host=HOST, port=PORT, access_log=False)
 
 
