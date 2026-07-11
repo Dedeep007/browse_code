@@ -78,34 +78,9 @@ The server starts immediately. Open your AI chat tab and you're ready to go. The
 
 - **File Operations:** Read, write, and patch files with beautiful inline terminal diffs:
 
-<details>
-<summary>▶️ <code>npm install next react react-dom</code> — <strong>✓ done · 22ms</strong></summary>
-
-**STDOUT:**
-
-📝 **Patch File** `portfolio-site/package.json`
-
-```diff
-  {
-    "name": "portfolio-site",
-    "main": "index.js",
-    "scripts": {
--     "test": "echo \"Error: no test specified\" && exit 1",
-+     "dev": "next dev",
-+     "build": "next build",
-+     "start": "next start",
-+     "lint": "next lint"
-    },
-    "keywords": [],
-  }
-```
-
-✅ **done · 2ms** — Patch applied successfully to `portfolio-site/package.json`.
-
-📁 **View Directory** `portfolio-site`
-✅ **done · 195ms** — `portfolio-site/package-lock.json`
-
-</details>
+<p align="center">
+  <img src="example.svg" alt="Tool Formatting Example" width="800">
+</p>
 
 - **Code Search:** Search across your entire codebase by keyword
 - **Terminal Commands:** Run shell commands with full stdout/stderr capture
