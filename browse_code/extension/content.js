@@ -40,7 +40,7 @@ spoofScript.onload = function () { this.remove(); };
 
 // Heartbeat: ping the server every 5 seconds so it knows the extension is connected
 function pingServer() {
-    fetch(`${LOCAL_SERVER}/extension/ping`).catch(() => {});
+    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`).catch(() => {});
 }
 pingServer();
 setInterval(pingServer, 5000);

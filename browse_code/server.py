@@ -173,8 +173,11 @@ def is_extension_connected():
     return (time.time() - _last_extension_ping) < _HEARTBEAT_TIMEOUT
 
 @app.get("/extension/ping")
-async def extension_ping():
+async def extension_ping(v: str = None):
     global _last_extension_ping
+    if v != "0.2.4":
+        return {"status": "ignored"}
+        
     was_connected = is_extension_connected()
     _last_extension_ping = time.time()
     if not was_connected:
