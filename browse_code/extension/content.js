@@ -8,6 +8,7 @@ if (hostname.includes('gemini.google.com')) {
         name: "Gemini",
         inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"], .ql-editor, textarea, input',
         sendBtn: 'button[aria-label*="Send"], button[aria-label*="send"], button[mattooltip*="Send"]',
+        stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"], button[mattooltip*="Stop"]',
         responseContainer: 'message-content, model-response, .model-response-text'
     };
 } else if (hostname.includes('claude.ai')) {
@@ -15,6 +16,7 @@ if (hostname.includes('gemini.google.com')) {
         name: "Claude",
         inputBox: '.ProseMirror[contenteditable="true"]',
         sendBtn: 'button[aria-label*="Send"], button[aria-label*="send"]',
+        stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"]',
         responseContainer: '.font-claude-response, .font-claude-message'
     };
 } else if (hostname.includes('huggingface.co')) {
@@ -22,6 +24,7 @@ if (hostname.includes('gemini.google.com')) {
         name: "HuggingFace",
         inputBox: 'input[name="prompt"]',
         sendBtn: 'button[type="submit"]',
+        stopBtn: 'button[aria-label*="Stop"], button:contains("Stop")',
         responseContainer: '.prose, .markdown, .break-words, [class*="message"]'
     };
 } else {
@@ -29,6 +32,7 @@ if (hostname.includes('gemini.google.com')) {
         name: "ChatGPT",
         inputBox: '#prompt-textarea',
         sendBtn: '[data-testid="send-button"], button[data-testid*="send"]',
+        stopBtn: 'button[aria-label*="Stop"], button[data-testid*="stop"]',
         responseContainer: '.markdown, .prose'
     };
 }
@@ -279,6 +283,12 @@ function processQueue() {
     // Do not interrupt the user if they are currently typing a message
     const userText = inputBox.tagName === 'INPUT' || inputBox.tagName === 'TEXTAREA' ? inputBox.value : inputBox.textContent;
     if (userText && userText.trim() !== "") return;
+
+    // Do not inject if the LLM is currently generating (Stop button is visible)
+    if (PLATFORM.stopBtn) {
+        const stopButton = document.querySelector(PLATFORM.stopBtn);
+        if (stopButton) return;
+    }
 
     const nextMessage = messageQueue.shift();
     isInjectingQueue = true;
