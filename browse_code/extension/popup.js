@@ -29,6 +29,13 @@ document.addEventListener('DOMContentLoaded', () => {
     });
 
     initBtn.addEventListener('click', () => {
+        const path = dirInput.value.trim();
+        if (!path) {
+            initBtn.innerText = 'Workspace directory required!';
+            setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
+            return;
+        }
+
         initBtn.innerText = 'Initializing...';
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             const activeTab = tabs[0];
