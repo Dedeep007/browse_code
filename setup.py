@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="browse_code",
-    version="0.1.0",
+    version="0.1.1",
     description="A local AI bridge package",
     packages=find_packages(),
     include_package_data=True,

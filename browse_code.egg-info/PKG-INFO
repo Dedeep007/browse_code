@@ -1,6 +1,6 @@
 Metadata-Version: 2.4
 Name: browse_code
-Version: 0.1.0
+Version: 0.1.1
 Summary: A local AI bridge package
 Requires-Dist: fastapi
 Requires-Dist: uvicorn
