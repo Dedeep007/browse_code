@@ -373,12 +373,13 @@ function trackResponse(initialText) {
                     });
 
                     const results = await Promise.all(toolPromises);
-                    let combinedFeedback = results.join("") + "Instruction: Review the output above. If the task requires more steps, continue. If finished, summarize what was done.";
-
                     messageCount++;
+                    let reminder = "";
                     if (injectN > 0 && messageCount % injectN === 0) {
-                        combinedFeedback += `\n\n[System Reminder (Context Refresh)]:\n${SYSTEM_PROMPT}`;
+                        reminder = `[System Reminder (Context Refresh)]:\n${SYSTEM_PROMPT}\n\n`;
                     }
+
+                    let combinedFeedback = reminder + results.join("") + "Instruction: Review the output above. If the task requires more steps, continue. If finished, summarize what was done.";
 
                     messageQueue.push(combinedFeedback);
                 } catch (err) {
