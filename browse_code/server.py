@@ -23,7 +23,6 @@ async def check_extension_connection():
         from rich import box
         console = Console()
         
-        await asyncio.sleep(3)
         while True:
             if not is_extension_connected():
                 ext_path = str(Path.home() / ".browse_code" / "extension")
