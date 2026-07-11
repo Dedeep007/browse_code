@@ -24,7 +24,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         chrome.storage.local.set({ workspaceDir: path, injectN: injectN });
         syncWithServer(path);
-        saveBtn.innerText = '✅ Saved!';
+        saveBtn.innerText = 'Saved!';
         setTimeout(() => saveBtn.innerText = 'Save Directory', 2000);
     });
 
@@ -37,20 +37,20 @@ document.addEventListener('DOMContentLoaded', () => {
             if (activeTab && validUrls.some(url => activeTab.url.includes(url))) {
                 chrome.tabs.sendMessage(activeTab.id, { action: "INITIALIZE_AGENT" }, () => {
                     if (chrome.runtime.lastError) {
-                        initBtn.innerText = '❌ Error: Refresh Tab First!';
-                        setTimeout(() => initBtn.innerText = '✨ Initialize Agent in Chat', 3000);
+                        initBtn.innerText = 'Error: Refresh Tab First!';
+                        setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
                     } else {
-                        initBtn.innerText = '✨ Initialize Agent in Chat';
+                        initBtn.innerText = 'Initialize Agent in Chat';
                     }
                 });
             } else {
-                initBtn.innerText = '❌ Not a valid AI chat tab';
-                setTimeout(() => initBtn.innerText = '✨ Initialize Agent in Chat', 3000);
+                initBtn.innerText = 'Not a valid AI chat tab';
+                setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
             }
         });
     });
 
-    function saveWorkspace(path) {
+    function syncWithServer(path) {
         fetch('http://127.0.0.1:5505/set-workspace', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -60,7 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    function updateStatus() {
+    function pollStatus() {
         fetch('http://127.0.0.1:5505/status')
             .then(res => res.json())
             .then(data => {
