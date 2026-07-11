@@ -570,13 +570,36 @@ async def run_tool(data: ToolModel):
             cmd = term_run_match.group(1).strip()
             env = os.environ.copy()
             env["FORCE_COLOR"] = "true"
-            try:
-                res = subprocess.run(cmd, shell=True, cwd=WORKSPACE_DIR, capture_output=True, text=True, timeout=300, env=env)
-                output = strip_ansi(f"STDOUT:\n{res.stdout}\nSTDERR:\n{res.stderr}")
-                result = {"output": truncate_output(output if output.strip() else "Executed.")}
-            except subprocess.TimeoutExpired as e:
-                partial = e.stdout or ""
-                result = {"output": truncate_output(strip_ansi(f"Timed out after 300s. Output:\n{partial}"))}
+            
+            pid = str(uuid.uuid4())[:8]
+            process = subprocess.Popen(cmd, shell=True, cwd=WORKSPACE_DIR, stdout=subprocess.PIPE, stderr=subprocess.STDOUT, text=True, bufsize=1, env=env)
+            BACKGROUND_PROCESSES[pid] = {'process': process, 'logs': deque(maxlen=500), 'status': 'running'}
+            threading.Thread(target=stream_process_output, args=(pid, process), daemon=True).start()
+
+            # Wait up to 5 seconds to see if it finishes quickly
+            start_time = time.time()
+            while time.time() - start_time < 5.0:
+                if process.poll() is not None:
+                    break
+                await asyncio.sleep(0.1)
+
+            # Give the log thread a tiny bit of time to flush if it just exited
+            await asyncio.sleep(0.1)
+            
+            logs = "".join(list(BACKGROUND_PROCESSES[pid]['logs']))
+            
+            if process.poll() is not None:
+                # Process finished quickly, treat as normal terminal_run
+                try:
+                    del BACKGROUND_PROCESSES[pid]
+                except KeyError:
+                    pass
+                output = strip_ansi(logs) if logs.strip() else "Executed."
+                result = {"output": truncate_output(output)}
+            else:
+                # Still running, auto-background it!
+                partial = strip_ansi(logs)
+                result = {"output": truncate_output(f"Status: ONGOING (Process auto-backgrounded after 5s)\nPID: {pid}\n\nOutput so far:\n{partial}\n\nInstruction: This process is still running. Use terminal_logs <pid='{pid}'> to check on it later, or terminal_kill to stop it.")}
 
         elif term_bg_match:
             cmd = term_bg_match.group(1).strip()
