@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "Local Agent Bridge",
+  "version": "2.0",
+  "description": "Autonomous AI Code Execution Bridge",
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.chatgpt.com/*",
+        "*://gemini.google.com/*",
+        "*://*.claude.ai/*",
+        "*://*.huggingface.co/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["spoof.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

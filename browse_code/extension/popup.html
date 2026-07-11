@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      width: 350px;
+      padding: 15px;
+      margin: 0;
+      background-color: #0f172a;
+      color: #f8fafc;
+    }
+
+    h3 {
+      margin-top: 0;
+      font-size: 16px;
+      border-bottom: 1px solid #334155;
+      padding-bottom: 5px;
+    }
+
+    label {
+      font-size: 12px;
+      font-weight: bold;
+      color: #94a3b8;
+    }
+
+    input {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 8px;
+      margin: 8px 0;
+      background: #1e293b;
+      border: 1px solid #475569;
+      color: white;
+      border-radius: 4px;
+    }
+
+    button {
+      width: 100%;
+      padding: 10px;
+      font-weight: bold;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: 0.2s;
+    }
+
+    #save-btn {
+      background-color: #3b82f6;
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    #init-btn {
+      background-color: #10b981;
+      color: white;
+      margin-bottom: 15px;
+    }
+
+    .dashboard {
+      background: #1e293b;
+      padding: 10px;
+      border-radius: 5px;
+      font-size: 12px;
+    }
+
+    .process-card {
+      background: #000;
+      border: 1px solid #334155;
+      padding: 8px;
+      margin-top: 8px;
+      border-radius: 4px;
+    }
+
+    .pid {
+      color: #f59e0b;
+      font-weight: bold;
+    }
+
+    .log-preview {
+      font-family: monospace;
+      color: #a3e635;
+      font-size: 10px;
+      white-space: pre-wrap;
+      overflow-x: hidden;
+      margin-top: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <h3>Agent Dashboard</h3>
+  <label>Workspace Directory:</label>
+  <input type="text" id="dir-input" placeholder="C:\Projects\app">
+  <label>Inject Prompt Every N Messages (0 to disable):</label>
+  <input type="number" id="inject-n-input" placeholder="5" value="5" min="0">
+  <button id="save-btn">Save Directory</button>
+  <button id="init-btn">Initialize Agent in Chat</button>
+
+  <h3>Live Terminals</h3>
+  <div class="dashboard" id="process-list">
+    <div style="color: #94a3b8;">No active background processes...</div>
+  </div>
+
+  <script src="popup.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,2 @@
+[console_scripts]
+bc = browse_code.cli:main
