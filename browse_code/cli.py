@@ -79,10 +79,9 @@ def print_banner():
 
 
 def setup_extension():
-    """First-time setup: extract extension, open Chrome, guide the user."""
+    """First-time setup: open Chrome, guide the user."""
     data_dir = get_data_dir()
     ext_dest = data_dir / "extension"
-    pkg_ext_dir = Path(__file__).parent / "extension"
 
     print_banner()
     console.print(
@@ -101,15 +100,9 @@ def setup_extension():
         console.print("  [dim]Skipped. Re-run 'bc' anytime to set it up.[/dim]")
         return False
 
-    # Extract extension files
-    console.print()
-    with console.status("[green]Extracting extension files...[/green]", spinner="dots"):
-        if ext_dest.exists():
-            shutil.rmtree(ext_dest)
-        shutil.copytree(pkg_ext_dir, ext_dest)
-
     ext_path_str = str(ext_dest)
-    console.print(f"  [green]Extracted to:[/green] [bold]{ext_path_str}[/bold]")
+    console.print()
+    console.print(f"  [green]Extension ready at:[/green] [bold]{ext_path_str}[/bold]")
     console.print()
 
     # Copy path to clipboard
@@ -129,42 +122,40 @@ def setup_extension():
     steps.add_column("step", style="bold green", width=4)
     steps.add_column("instruction")
 
-    steps.add_row("1.", 'Enable [bold]"Developer mode"[/bold] toggle (top-right corner)')
-    steps.add_row("2.", 'Click [bold]"Load unpacked"[/bold]')
-    if copied:
-        steps.add_row("3.", "Paste the path [green](already copied to your clipboard)[/green]")
-    else:
-        steps.add_row("3.", f"Select this folder: [bold]{ext_path_str}[/bold]")
+    steps.add_row("1.", "Enable [bold]Developer mode[/bold] in the top right")
+    steps.add_row(
+        "2.",
+        f"Click [bold]Load unpacked[/bold] and select this folder:\n[cyan]{ext_path_str}[/cyan]"
+        + (" [dim](Copied to clipboard!)[/dim]" if copied else ""),
+    )
+    steps.add_row("3.", "The Browse Code icon should now appear in your browser")
 
-    console.print()
     console.print(
         Panel(
             steps,
-            title="[bold green]Quick Setup[/bold green]",
-            title_align="left",
-            border_style="green",
+            title="[bold]Installation Steps[/bold]",
+            border_style="blue",
             box=box.ROUNDED,
-            padding=(1, 1),
+            padding=(1, 2),
             expand=False,
         )
     )
-    console.print()
 
-    Prompt.ask("  Press [bold]Enter[/bold] after you've loaded the extension")
+    # Ask user to confirm they installed it
+    Confirm.ask("\n  [yellow]Did you finish installing it?[/yellow]", default=True)
 
-    # Mark as installed
+    # Create marker file
     marker = data_dir / ".installed"
     marker.touch()
 
-    console.print("  [bold green]Extension setup complete![/bold green]")
     return True
 
 
 def print_server_header():
-    """Print the server status panel before starting."""
-    info = Table(show_header=False, box=None, padding=(0, 1), show_edge=False)
-    info.add_column("key", style="dim", width=12)
-    info.add_column("value")
+    """Print the server startup header."""
+    info = Table.grid(padding=(0, 2))
+    info.add_column(style="dim", justify="right")
+    info.add_column()
 
     info.add_row("Endpoint", f"[bold]http://{HOST}:{PORT}[/bold]")
     info.add_row("Extension", "[yellow]Waiting for connection...[/yellow]")
@@ -189,6 +180,16 @@ def print_server_header():
 def main():
     data_dir = get_data_dir()
     marker = data_dir / ".installed"
+
+    # Always sync the latest extension files from the package to the data dir
+    # so updates (like new icons, JS changes) propagate automatically
+    ext_dest = data_dir / "extension"
+    pkg_ext_dir = Path(__file__).parent / "extension"
+    try:
+        import shutil
+        shutil.copytree(pkg_ext_dir, ext_dest, dirs_exist_ok=True)
+    except Exception:
+        pass
 
     if not marker.exists():
         result = setup_extension()
