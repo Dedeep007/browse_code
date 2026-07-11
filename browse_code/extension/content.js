@@ -231,11 +231,34 @@ async function injectAndSend(promptText) {
 
     await new Promise(r => setTimeout(r, 800));
 
-    const sendButton = document.querySelector(PLATFORM.sendBtn);
-    if (sendButton && (!sendButton.disabled && sendButton.getAttribute('aria-disabled') !== 'true')) {
-        sendButton.click();
-    } else {
+    const trySend = () => {
+        const btn = document.querySelector(PLATFORM.sendBtn);
+        if (btn && !btn.disabled && btn.getAttribute('aria-disabled') !== 'true') {
+            btn.click();
+            return true;
+        }
+        return false;
+    };
+
+    if (!trySend()) {
         inputBox.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter' }));
+        
+        // If the user switched tabs, React might suspend and the button stays disabled.
+        // Setup an aggressive retry loop that clicks it the moment they focus the tab and React wakes up.
+        const clickInterval = setInterval(() => {
+            const currentText = inputBox.tagName === 'INPUT' || inputBox.tagName === 'TEXTAREA' ? inputBox.value : inputBox.textContent;
+            // Abort if the user manually cleared or changed the input significantly
+            if (!currentText || currentText.length < promptText.length * 0.5) {
+                clearInterval(clickInterval);
+                return;
+            }
+            if (trySend()) {
+                clearInterval(clickInterval);
+            }
+        }, 500);
+        
+        // Clear interval after 15 seconds to avoid infinite loops
+        setTimeout(() => clearInterval(clickInterval), 15000);
     }
 }
 
