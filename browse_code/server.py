@@ -17,7 +17,6 @@ from pydantic import BaseModel
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    print_startup_banner(WORKSPACE_DIR, "127.0.0.1", 5505)
     yield
 
 

@@ -19,6 +19,13 @@ console = Console()
 PORT = 5505
 HOST = "127.0.0.1"
 
+ASCII_BANNER = r"""
+  ___                             ___         _
+ | _ ) _ _  ___  __ __ __ ___   / __| ___  __| | ___
+ | _ \| '_|/ _ \ \ V  V /(_-< | (__ / _ \/ _` |/ -_)
+ |___/|_|  \___/  \_/\_/ /__/   \___|\___/\__,_|\___|
+"""
+
 
 def get_data_dir():
     """Return ~/.browse_code, creating it if needed."""
@@ -55,20 +62,7 @@ def copy_to_clipboard(text):
 
 def print_banner():
     """Print the Browse Code ASCII art banner."""
-    banner_text = Text()
-    banner_text.append("  { ", style="bold cyan")
-    banner_text.append("Browse Code", style="bold white")
-    banner_text.append(" }", style="bold cyan")
-
-    console.print()
-    console.print(
-        Panel(
-            banner_text,
-            box=box.DOUBLE,
-            border_style="cyan",
-            padding=(1, 4),
-        )
-    )
+    console.print(f"[bold green]{ASCII_BANNER}[/bold green]")
 
 
 def setup_extension():
@@ -78,13 +72,12 @@ def setup_extension():
     pkg_ext_dir = Path(__file__).parent / "extension"
 
     print_banner()
-    console.print()
     console.print(
         Panel(
             "[bold]First Time Setup[/bold]\n\n"
             "Browse Code needs a Chrome extension to connect\n"
             "your browser to the local server.",
-            border_style="yellow",
+            border_style="green",
             box=box.ROUNDED,
             padding=(1, 2),
         )
@@ -96,7 +89,7 @@ def setup_extension():
 
     # Extract extension files
     console.print()
-    with console.status("[cyan]Extracting extension files...[/cyan]"):
+    with console.status("[green]Extracting extension files...[/green]", spinner="dots"):
         if ext_dest.exists():
             shutil.rmtree(ext_dest)
         shutil.copytree(pkg_ext_dir, ext_dest)
@@ -109,7 +102,7 @@ def setup_extension():
     copied = copy_to_clipboard(ext_path_str)
 
     # Open chrome://extensions
-    console.print("  [cyan]Opening Chrome extensions page...[/cyan]")
+    console.print("  [green]Opening Chrome extensions page...[/green]")
     webbrowser.open("chrome://extensions/")
 
     # Setup instructions
@@ -119,7 +112,7 @@ def setup_extension():
         padding=(0, 2),
         show_edge=False,
     )
-    steps.add_column("step", style="bold cyan", width=4)
+    steps.add_column("step", style="bold green", width=4)
     steps.add_column("instruction")
 
     steps.add_row("1.", 'Enable [bold]"Developer mode"[/bold] toggle (top-right corner)')
@@ -133,9 +126,9 @@ def setup_extension():
     console.print(
         Panel(
             steps,
-            title="[bold]Quick Setup[/bold]",
+            title="[bold green]Quick Setup[/bold green]",
             title_align="left",
-            border_style="cyan",
+            border_style="green",
             box=box.ROUNDED,
             padding=(1, 1),
         )
@@ -160,16 +153,16 @@ def print_server_header():
 
     info.add_row("Endpoint", f"[bold]http://{HOST}:{PORT}[/bold]")
     info.add_row("Extension", "[yellow]Waiting for connection...[/yellow]")
-    info.add_row("Status", "[green]Running[/green]")
+    info.add_row("Status", "[bold green]Running[/bold green]")
 
     console.print(
         Panel(
             info,
-            title="[bold cyan]{ [/bold cyan][bold white]Browse Code[/bold white][bold cyan] }[/bold cyan]",
+            title="[bold green]Browse Code[/bold green]",
             title_align="left",
             subtitle="[dim]Press Ctrl+C to stop[/dim]",
             subtitle_align="right",
-            border_style="cyan",
+            border_style="green",
             box=box.ROUNDED,
             padding=(1, 2),
         )
@@ -188,7 +181,6 @@ def main():
     else:
         print_banner()
 
-    console.print()
     print_server_header()
 
     try:
