@@ -10,6 +10,10 @@
 
 **Browse Code** is a CLI tool that turns any AI chatbot (ChatGPT, Gemini, Claude, HuggingFace) into an autonomous coding agent. It bridges your browser and local terminal, letting AI read/write files, run commands, and manage processes on your machine.
 
+<p align="center">
+  <img src="example.svg" alt="Tool Formatting Example" width="800">
+</p>
+
 ## How It Works
 
 Browse Code has two parts:
@@ -76,12 +80,7 @@ The server starts immediately. Open your AI chat tab and you're ready to go. The
 
 ## Features
 
-- **File Operations:** Read, write, and patch files with beautiful inline terminal diffs:
-
-<p align="center">
-  <img src="example.svg" alt="Tool Formatting Example" width="800">
-</p>
-
+- **File Operations:** Read, write, and patch files with inline terminal diffs
 - **Code Search:** Search across your entire codebase by keyword
 - **Terminal Commands:** Run shell commands with full stdout/stderr capture
 - **Background Processes:** Start, monitor, and kill long-running processes
