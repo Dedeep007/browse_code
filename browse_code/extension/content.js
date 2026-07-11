@@ -38,6 +38,13 @@ spoofScript.src = chrome.runtime.getURL('spoof.js');
 (document.head || document.documentElement).appendChild(spoofScript);
 spoofScript.onload = function () { this.remove(); };
 
+// Heartbeat: ping the server every 5 seconds so it knows the extension is connected
+function pingServer() {
+    fetch(`${LOCAL_SERVER}/extension/ping`).catch(() => {});
+}
+pingServer();
+setInterval(pingServer, 5000);
+
 const SYSTEM_PROMPT = `You are an elite, autonomous AI software engineer (similar to Antigravity or Devin) connected to a local execution bridge.
 You do NOT have direct access to my file system. You interact with it ONLY by emitting the XML tool tags defined below, which are executed locally on my machine.
 

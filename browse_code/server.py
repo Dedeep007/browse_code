@@ -114,12 +114,35 @@ def print_startup_banner(workspace: str, host: str, port: int):
     ep_text = f" Endpoint   http://{host}:{port}"
     ep_pad = max(0, width - len(ep_text))
     print(f"{C_HEADER}│{C_RESET} {C_MUTED}Endpoint {C_RESET}  http://{host}:{port}{' ' * ep_pad}{C_HEADER}│{C_RESET}")
+    ext_label = "Extension"
+    ext_status = "Waiting for connection..."
+    ext_text = f" {ext_label}  {ext_status}"
+    ext_pad = max(0, width - len(ext_text))
+    print(f"{C_HEADER}│{C_RESET} {C_MUTED}{ext_label}{C_RESET}  {C_WARN}{ext_status}{C_RESET}{' ' * ext_pad}{C_HEADER}│{C_RESET}")
     print(f"{C_HEADER}╰{'─' * width}╯{C_RESET}")
     print()
 
 
 WORKSPACE_DIR = r"C:\Users\dedeep vasireddy\Downloads\test"
 BACKGROUND_PROCESSES = {}
+
+# Extension heartbeat tracking
+_last_extension_ping = None
+_HEARTBEAT_TIMEOUT = 10  # seconds — extension is "connected" if pinged within this window
+
+def is_extension_connected():
+    if _last_extension_ping is None:
+        return False
+    return (time.time() - _last_extension_ping) < _HEARTBEAT_TIMEOUT
+
+@app.get("/extension/ping")
+async def extension_ping():
+    global _last_extension_ping
+    was_connected = is_extension_connected()
+    _last_extension_ping = time.time()
+    if not was_connected:
+        print(f"\n{C_OK}[+] Extension connected{C_RESET}")
+    return {"status": "ok"}
 
 def cleanup_background_processes():
     print(f"\n{C_WARN}⏻  Shutting down — cleaning up background processes...{C_RESET}")
@@ -150,7 +173,8 @@ async def request_logger(request: Request, call_next):
 
     # The /extension/run-tool endpoint already prints its own detailed
     # banner + result, so skip the generic line there to avoid duplication.
-    if request.url.path != "/extension/run-tool":
+    # Also skip /extension/ping to avoid flooding the log with heartbeats.
+    if request.url.path not in ("/extension/run-tool", "/extension/ping"):
         print(f"{C_DIM}→{C_RESET} {request.method} {request.url.path}  "
               f"{color}{status}{C_RESET}  {C_DIM}{elapsed_ms:.0f}ms{C_RESET}")
 
