@@ -6,13 +6,13 @@
 
 **Browse Code** is a powerful CLI tool that bridges your local terminal environment with your browser. It runs a local backend server and injects an AI-assisted Chrome extension, enabling seamless automation, local file reads/writes, and background process management directly from the browser.
 
-## ✨ Features
+## Features
 
 - **Local AI Bridge Server:** A fast, secure FastAPI-based server that exposes your local environment (reading files, listing directories, executing terminal commands, managing background processes).
 - **Chrome Extension Integration:** Automatically sets up (with your permission) a Chrome extension that interacts with the backend.
 - **Easy-to-use CLI:** Start your AI sessions with a single `bc` command.
 
-## 🚀 Installation
+## Installation
 
 ### For Users
 
@@ -34,7 +34,7 @@ pip install browse-code
    pip install -e .
    ```
 
-## 💻 Usage
+## Usage
 
 Once installed, simply run the CLI command:
 
@@ -46,7 +46,7 @@ bc
 1. **Extension Setup:** The tool will ask if you want to install its companion Chrome extension. If you agree, it will extract the extension to your home folder (`~/.browse_code/extension`) and offer to launch Chrome with the extension loaded.
 2. **Server Initialization:** It will start the AI session backend server on `http://127.0.0.1:5505`. Keep this terminal open to maintain the bridge connection and view real-time execution logs and diffs.
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -56,6 +56,6 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 4. Push to the branch (`git push origin feature/AmazingFeature`).
 5. Open a Pull Request.
 
-## 📄 License
+## License
 
 Distributed under the MIT License.
