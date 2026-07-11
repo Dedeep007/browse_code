@@ -184,6 +184,36 @@ async def extension_ping(v: str = None):
         print(f"\n{C_OK}[+] Extension connected{C_RESET}")
     return {"status": "ok"}
 
+class ImageModel(BaseModel):
+    base64: str
+
+@app.post("/extension/save-image")
+async def save_image(data: ImageModel):
+    import base64
+    try:
+        header, encoded = data.base64.split(",", 1)
+        ext = "png"
+        if "jpeg" in header or "jpg" in header:
+            ext = "jpg"
+        elif "webp" in header:
+            ext = "webp"
+            
+        image_data = base64.b64decode(encoded)
+        creations_dir = os.path.join(WORKSPACE_DIR, "agent-creations")
+        os.makedirs(creations_dir, exist_ok=True)
+        
+        filename = f"generated_{uuid.uuid4().hex[:8]}.{ext}"
+        filepath = os.path.join(creations_dir, filename)
+        
+        with open(filepath, "wb") as f:
+            f.write(image_data)
+            
+        rel_path = f"agent-creations/{filename}"
+        print(f"\n{C_OK}[+] Saved AI image to {rel_path}{C_RESET}")
+        return {"status": "ok", "path": rel_path}
+    except Exception as e:
+        return {"status": "error", "message": str(e)}
+
 def cleanup_background_processes():
     print(f"\n{C_WARN}⏻  Shutting down — cleaning up background processes...{C_RESET}")
     for pid, data in BACKGROUND_PROCESSES.items():
