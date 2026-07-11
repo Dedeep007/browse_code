@@ -82,6 +82,7 @@ def setup_extension():
             border_style="green",
             box=box.ROUNDED,
             padding=(1, 2),
+            expand=False,
         )
     )
 
@@ -133,6 +134,7 @@ def setup_extension():
             border_style="green",
             box=box.ROUNDED,
             padding=(1, 1),
+            expand=False,
         )
     )
     console.print()
@@ -160,13 +162,14 @@ def print_server_header():
     console.print(
         Panel(
             info,
-            title="[bold green]Browse Code[/bold green]",
-            title_align="left",
+            title="[bold green]Agent Bridge Backend[/bold green]",
+            title_align="center",
             subtitle="[dim]Press Ctrl+C to stop[/dim]",
             subtitle_align="right",
             border_style="green",
             box=box.ROUNDED,
             padding=(1, 2),
+            expand=False,
         )
     )
     console.print()
