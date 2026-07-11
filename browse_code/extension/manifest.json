@@ -1,6 +1,6 @@
 {
   "manifest_version": 3,
-  "name": "Local Agent Bridge",
+  "name": "Browse Code Bridge",
   "version": "2.0",
   "description": "Autonomous AI Code Execution Bridge",
   "permissions": [
