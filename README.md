@@ -1,5 +1,6 @@
 # Browse Code
 
+![PyPI version](https://badge.fury.io/py/browse-code.svg)
 ![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
@@ -20,7 +21,6 @@ Install the package directly via pip:
 ```bash
 pip install browse-code
 ```
-*(Note: If this package is published to PyPI, you can install it as above. Otherwise, clone the repo and see "For Developers" below).*
 
 ### For Developers
 
