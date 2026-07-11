@@ -23,8 +23,8 @@ async def check_extension_connection():
         from rich import box
         console = Console()
         
+        await asyncio.sleep(3)
         while True:
-            await asyncio.sleep(30)  # Check every 30 seconds
             if not is_extension_connected():
                 ext_path = str(Path.home() / ".browse_code" / "extension")
                 console.print()
@@ -48,6 +48,7 @@ async def check_extension_connection():
                         expand=False
                     )
                 )
+            await asyncio.sleep(30)
     except asyncio.CancelledError:
         pass
 
