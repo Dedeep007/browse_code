@@ -15,9 +15,47 @@ from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
+async def check_extension_connection():
+    from pathlib import Path
+    try:
+        from rich.console import Console
+        from rich.panel import Panel
+        from rich import box
+        console = Console()
+        
+        while True:
+            await asyncio.sleep(30)  # Check every 30 seconds
+            if not is_extension_connected():
+                ext_path = str(Path.home() / ".browse_code" / "extension")
+                console.print()
+                console.print(
+                    Panel(
+                        "[bold yellow]Extension Not Connected![/bold yellow]\n\n"
+                        "The server is running, but the browser extension hasn't connected.\n"
+                        "To fix this:\n"
+                        "  1. Ensure the [bold]Browse Code[/bold] extension is installed and enabled.\n"
+                        "  2. Make sure Chrome is open.\n\n"
+                        "[dim]If you haven't installed it yet:[/dim]\n"
+                        "  • Open [cyan]chrome://extensions/[/cyan]\n"
+                        "  • Enable [bold]Developer Mode[/bold] (top right)\n"
+                        "  • Click [bold]Load unpacked[/bold] and select this folder:\n"
+                        f"    [green]{ext_path}[/green]",
+                        title="[bold yellow]Warning[/bold yellow]",
+                        title_align="left",
+                        border_style="yellow",
+                        box=box.ROUNDED,
+                        padding=(1, 2),
+                        expand=False
+                    )
+                )
+    except asyncio.CancelledError:
+        pass
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
+    task = asyncio.create_task(check_extension_connection())
     yield
+    task.cancel()
 
 
 app = FastAPI(title="Agent Bridge Backend", lifespan=lifespan)
