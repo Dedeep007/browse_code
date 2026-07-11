@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="logo.png" alt="Browse Code" width="200">
+</p>
+
 # Browse Code
 
 ![PyPI version](https://badge.fury.io/py/browse-code.svg)
