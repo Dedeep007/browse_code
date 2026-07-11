@@ -6,7 +6,7 @@ let PLATFORM = {};
 if (hostname.includes('gemini.google.com')) {
     PLATFORM = {
         name: "Gemini",
-        inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"]',
+        inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"], .ql-editor, textarea, input',
         sendBtn: 'button[aria-label*="Send"], button[aria-label*="send"], button[mattooltip*="Send"]',
         responseContainer: 'message-content, model-response, .model-response-text'
     };
@@ -256,12 +256,6 @@ function processQueue() {
     // Do not interrupt the user if they are currently typing a message
     const userText = inputBox.tagName === 'INPUT' || inputBox.tagName === 'TEXTAREA' ? inputBox.value : inputBox.textContent;
     if (userText && userText.trim() !== "") return;
-
-    // Do not inject if the LLM is currently generating (Send button is missing or disabled)
-    const sendButton = document.querySelector(PLATFORM.sendBtn);
-    if (!sendButton || sendButton.disabled || sendButton.getAttribute('aria-disabled') === 'true') {
-        return;
-    }
 
     const nextMessage = messageQueue.shift();
     isInjectingQueue = true;
