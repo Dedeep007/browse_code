@@ -43,8 +43,16 @@ bc
 ```
 
 ### What happens when you run `bc`?
-1. **Extension Setup:** The tool will ask if you want to install its companion Chrome extension. If you agree, it will extract the extension to your home folder (`~/.browse_code/extension`) and offer to launch Chrome with the extension loaded.
-2. **Server Initialization:** It will start the AI session backend server on `http://127.0.0.1:5505`. Keep this terminal open to maintain the bridge connection and view real-time execution logs and diffs.
+
+**First run:**
+1. The CLI asks if you want to set up the Chrome extension.
+2. If you agree, it extracts the extension to `~/.browse_code/extension/` and copies the path to your clipboard.
+3. It opens `chrome://extensions/` automatically.
+4. You just need to enable "Developer mode", click "Load unpacked", and paste the path.
+5. Once done, press Enter and the server starts.
+
+**Every run after that:**
+The server starts immediately with no prompts. The extension stays loaded in Chrome across sessions.
 
 ## Contributing
 
