@@ -104,6 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
             .catch(() => {
                 processList.innerHTML = '<div style="color: #ef4444;">Disconnected from local server.</div>';
             });
+        });
     }
 
     setInterval(pollStatus, 1500);
