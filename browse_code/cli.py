@@ -157,8 +157,13 @@ def print_server_header():
     info.add_column(style="dim", justify="right")
     info.add_column()
 
+    from .server import SERVER_AUTH_KEY
+    from . import __version__
+    
     info.add_row("Endpoint", f"[bold]http://{HOST}:{PORT}[/bold]")
     info.add_row("Extension", "[yellow]Waiting for connection...[/yellow]")
+    info.add_row("Auth Key", f"[bold cyan]{SERVER_AUTH_KEY}[/bold cyan]")
+    info.add_row("Version", f"[dim]{__version__}[/dim]")
     info.add_row("Status", "[bold green]Running[/bold green]")
 
     console.print(
