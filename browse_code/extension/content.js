@@ -2,6 +2,17 @@ const LOCAL_SERVER = "http://127.0.0.1:5505";
 const hostname = window.location.hostname;
 
 let PLATFORM = {};
+let sessionToken = null;
+let serverKey = null;
+
+chrome.storage.local.get(['serverKey'], (res) => {
+    if (res.serverKey) serverKey = res.serverKey;
+});
+chrome.storage.onChanged.addListener((changes, namespace) => {
+    if (namespace === 'local' && changes.serverKey) {
+        serverKey = changes.serverKey.newValue;
+    }
+});
 
 if (hostname.includes('gemini.google.com')) {
     PLATFORM = {
@@ -44,7 +55,13 @@ spoofScript.onload = function () { this.remove(); };
 
 // Heartbeat: ping the server every 5 seconds so it knows the extension is connected
 function pingServer() {
-    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`).catch(() => {});
+    if (!sessionToken || !serverKey) return;
+    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, {
+        headers: { 
+            'X-Session-Token': sessionToken,
+            'X-Server-Key': serverKey
+        }
+    }).catch(() => {});
 }
 pingServer();
 setInterval(pingServer, 5000);
@@ -171,10 +188,25 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: "received" });
     if (request.action === "INITIALIZE_AGENT") {
-        messageCount = 0;
-        startNewChat()
-            .then(() => injectAndSend(SYSTEM_PROMPT))
-            .catch(err => console.error("Initialization sequence failed:", err));
+        if (!serverKey) {
+            console.error("No Server Key configured. Please add it in the extension popup.");
+            return;
+        }
+        fetch(`${LOCAL_SERVER}/extension/init`, { 
+            method: 'POST',
+            headers: { 'X-Server-Key': serverKey }
+        })
+            .then(res => res.json())
+            .then(data => {
+                if (data.token) {
+                    sessionToken = data.token;
+                    messageCount = 0;
+                    startNewChat()
+                        .then(() => injectAndSend(SYSTEM_PROMPT))
+                        .catch(err => console.error("Initialization sequence failed:", err));
+                }
+            })
+            .catch(err => console.error("Failed to initialize session:", err));
     }
     return true;
 });
@@ -185,6 +217,22 @@ window.addEventListener('message', (event) => {
         if (typeof messageQueue !== 'undefined') {
             messageQueue.push(event.data.message);
         }
+    } else if (event.data && event.data.type === 'AGENT_BRIDGE_FORWARD_IMAGE') {
+        if (!sessionToken || !serverKey) return;
+        fetch(`${LOCAL_SERVER}/extension/save-image`, {
+            method: 'POST',
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Session-Token': sessionToken,
+                'X-Server-Key': serverKey
+            },
+            body: JSON.stringify({ base64: event.data.base64 })
+        }).then(res => res.json()).then(data => {
+            if (data.status === 'ok') {
+                const msg = `[System - Image Saved]: An SVG you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`;
+                messageQueue.push(msg);
+            }
+        }).catch(err => console.error(err));
     }
 });
 
@@ -368,7 +416,11 @@ function trackResponse(initialText) {
                     const toolPromises = toolMatches.map(async (toolCall) => {
                         const response = await fetch(`${LOCAL_SERVER}/extension/run-tool`, {
                             method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Session-Token': sessionToken,
+                                'X-Server-Key': serverKey
+                            },
                             body: JSON.stringify({ tool_call: toolCall })
                         });
                         const resultData = await response.json();
@@ -410,28 +462,38 @@ setInterval(() => {
             const processImg = () => {
                 if (img.width > 0 && img.width < 100) return; // Skip tiny icons
                 
-                fetch(img.src)
-                    .then(res => res.blob())
-                    .then(blob => {
+                if (window !== window.top) {
+                    fetch(img.src).then(res => res.blob()).then(blob => {
                         const reader = new FileReader();
                         reader.onloadend = () => {
-                            fetch(`${LOCAL_SERVER}/extension/save-image`, {
-                                method: 'POST',
-                                headers: { 'Content-Type': 'application/json' },
-                                body: JSON.stringify({ base64: reader.result })
-                            }).then(res => res.json()).then(data => {
-                                if (data.status === 'ok') {
-                                    const msg = `[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`;
-                                    if (window !== window.top) {
-                                        window.parent.postMessage({ type: 'AGENT_BRIDGE_IMAGE_SAVED', message: msg }, '*');
-                                    } else {
-                                        messageQueue.push(msg);
-                                    }
-                                }
-                            }).catch(err => console.error(err));
+                            window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: reader.result }, '*');
                         };
                         reader.readAsDataURL(blob);
-                    }).catch(err => console.error("Failed to fetch image blob", err));
+                    });
+                } else {
+                    if (!sessionToken || !serverKey) return;
+                    fetch(img.src)
+                        .then(res => res.blob())
+                        .then(blob => {
+                            const reader = new FileReader();
+                            reader.onloadend = () => {
+                                fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                                    method: 'POST',
+                                    headers: { 
+                                        'Content-Type': 'application/json',
+                                        'X-Session-Token': sessionToken,
+                                        'X-Server-Key': serverKey
+                                    },
+                                    body: JSON.stringify({ base64: reader.result })
+                                }).then(res => res.json()).then(data => {
+                                    if (data.status === 'ok') {
+                                        messageQueue.push(`[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`);
+                                    }
+                                }).catch(err => console.error(err));
+                            };
+                            reader.readAsDataURL(blob);
+                        }).catch(err => console.error("Failed to fetch image blob", err));
+                }
             };
             
             if (img.src.startsWith('blob:') || img.complete) {
@@ -453,20 +515,25 @@ setInterval(() => {
             const svgData = new XMLSerializer().serializeToString(svg);
             const base64 = "data:image/svg+xml;base64," + btoa(unescape(encodeURIComponent(svgData)));
             
-            fetch(`${LOCAL_SERVER}/extension/save-image`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ base64: base64 })
-            }).then(res => res.json()).then(data => {
-                if (data.status === 'ok') {
-                    const msg = `[System - Image Saved]: An SVG you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`;
-                    if (window !== window.top) {
-                        window.parent.postMessage({ type: 'AGENT_BRIDGE_IMAGE_SAVED', message: msg }, '*');
-                    } else {
+            if (window !== window.top) {
+                window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
+            } else {
+                if (!sessionToken || !serverKey) return;
+                fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                    method: 'POST',
+                    headers: { 
+                        'Content-Type': 'application/json',
+                        'X-Session-Token': sessionToken,
+                        'X-Server-Key': serverKey
+                    },
+                    body: JSON.stringify({ base64: base64 })
+                }).then(res => res.json()).then(data => {
+                    if (data.status === 'ok') {
+                        const msg = `[System - Image Saved]: An SVG you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`;
                         messageQueue.push(msg);
                     }
-                }
-            }).catch(err => console.error(err));
+                }).catch(err => console.error(err));
+            }
         }
     } catch (err) {
         console.error("Image processing error", err);

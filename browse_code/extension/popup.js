@@ -1,14 +1,20 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dirInput = document.getElementById('dir-input');
     const injectNInput = document.getElementById('inject-n-input');
+    const serverKeyInput = document.getElementById('server-key-input');
     const saveBtn = document.getElementById('save-btn');
     const initBtn = document.getElementById('init-btn');
     const processList = document.getElementById('process-list');
 
-    chrome.storage.local.get(['workspaceDir', 'injectN'], (result) => {
+    chrome.storage.local.get(['workspaceDir', 'injectN', 'serverKey'], (result) => {
         if (result.workspaceDir) {
             dirInput.value = result.workspaceDir;
-            syncWithServer(result.workspaceDir);
+        }
+        if (result.serverKey) {
+            serverKeyInput.value = result.serverKey;
+        }
+        if (result.workspaceDir && result.serverKey) {
+            syncWithServer(result.workspaceDir, result.serverKey);
         }
         if (result.injectN !== undefined && injectNInput) {
             injectNInput.value = result.injectN;
@@ -17,15 +23,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveBtn.addEventListener('click', () => {
         const path = dirInput.value.trim();
+        const key = serverKeyInput.value.trim();
         let injectN = 10;
         if (injectNInput) {
-            injectN = parseInt(injectNInput.value, 10);
-            if (isNaN(injectN)) injectN = 10;
+            const val = parseInt(injectNInput.value, 10);
+            if (!isNaN(val)) injectN = val;
         }
-        chrome.storage.local.set({ workspaceDir: path, injectN: injectN });
-        syncWithServer(path);
-        saveBtn.innerText = 'Saved!';
-        setTimeout(() => saveBtn.innerText = 'Save Directory', 2000);
+        
+        chrome.storage.local.set({ workspaceDir: path, injectN: injectN, serverKey: key }, () => {
+            saveBtn.textContent = "Saved!";
+            setTimeout(() => saveBtn.textContent = "Save Settings", 1500);
+            syncWithServer(path, key);
+        });
     });
 
     initBtn.addEventListener('click', () => {
@@ -57,20 +66,26 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    function syncWithServer(path) {
+    function syncWithServer(path, key) {
+        if (!path || !key) return;
         fetch('http://127.0.0.1:5505/set-workspace', {
             method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
+            headers: { 
+                'Content-Type': 'application/json',
+                'X-Server-Key': key
+            },
             body: JSON.stringify({ path: path })
-        }).catch(() => {
-            // Silently ignore connection errors so Chrome doesn't flag them in the extension dashboard
-        });
+        }).catch(err => console.error("Bridge server not running"));
     }
 
     function pollStatus() {
-        fetch('http://127.0.0.1:5505/status')
-            .then(res => res.json())
-            .then(data => {
+        chrome.storage.local.get(['serverKey'], (result) => {
+            if (!result.serverKey) return;
+            fetch('http://127.0.0.1:5505/status', {
+                headers: { 'X-Server-Key': result.serverKey }
+            })
+                .then(res => res.json())
+                .then(data => {
                 if (!data.processes || data.processes.length === 0) {
                     processList.innerHTML = '<div style="color: #94a3b8;">No active background processes...</div>';
                     return;

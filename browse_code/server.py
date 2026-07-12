@@ -9,9 +9,10 @@ import asyncio
 import shutil
 import time
 import platform
+import traceback
 from collections import deque
 from contextlib import asynccontextmanager
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException, Request, Header
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -137,6 +138,20 @@ def print_tool_end(ok: bool, elapsed_ms: float, note: str = ""):
         line += f"  {C_MUTED}{note}{C_RESET}"
     print(line)
 
+def load_or_create_server_key():
+    key_path = os.path.expanduser("~/.browse_code_key")
+    if os.path.exists(key_path):
+        with open(key_path, "r") as f:
+            return f.read().strip()
+    key = uuid.uuid4().hex
+    try:
+        with open(key_path, "w") as f:
+            f.write(key)
+    except:
+        pass
+    return key
+
+SERVER_AUTH_KEY = load_or_create_server_key()
 
 def print_startup_banner(workspace: str, host: str, port: int):
     width = 78
@@ -156,6 +171,13 @@ def print_startup_banner(workspace: str, host: str, port: int):
     ext_text = f" {ext_label}  {ext_status}"
     ext_pad = max(0, width - len(ext_text))
     print(f"{C_HEADER}│{C_RESET} {C_MUTED}{ext_label}{C_RESET}  {C_WARN}{ext_status}{C_RESET}{' ' * ext_pad}{C_HEADER}│{C_RESET}")
+    
+    key_label = "Auth Key"
+    key_status = SERVER_AUTH_KEY
+    key_text = f" {key_label}  {key_status}"
+    key_pad = max(0, width - len(key_text))
+    print(f"{C_HEADER}│{C_RESET} {C_MUTED}{key_label}{C_RESET}  {C_OK}{key_status}{C_RESET}{' ' * key_pad}{C_HEADER}│{C_RESET}")
+    
     print(f"{C_HEADER}╰{'─' * width}╯{C_RESET}")
     print()
 
@@ -167,14 +189,38 @@ BACKGROUND_PROCESSES = {}
 _last_extension_ping = None
 _HEARTBEAT_TIMEOUT = 10  # seconds — extension is "connected" if pinged within this window
 
+ACTIVE_SESSION_TOKENS = set()
+
+def verify_server_key(x_server_key: str):
+    if not x_server_key or x_server_key != SERVER_AUTH_KEY:
+        raise HTTPException(status_code=401, detail="Invalid server key. Please configure the correct key in the extension popup.")
+
+def verify_session(x_session_token: str = Header(None)):
+    if not ACTIVE_SESSION_TOKENS:
+        raise HTTPException(status_code=401, detail="No active agent session initialized.")
+    if x_session_token not in ACTIVE_SESSION_TOKENS:
+        raise HTTPException(status_code=401, detail="Invalid session token.")
+
+@app.post("/extension/init")
+async def init_session(x_server_key: str = Header(None)):
+    verify_server_key(x_server_key)
+    token = uuid.uuid4().hex
+    ACTIVE_SESSION_TOKENS.add(token)
+    print(f"\n{C_OK}[+] New agent session initialized.{C_RESET}")
+    return {"token": token}
+
 def is_extension_connected():
     if _last_extension_ping is None:
         return False
     return (time.time() - _last_extension_ping) < _HEARTBEAT_TIMEOUT
 
 @app.get("/extension/ping")
-async def extension_ping(v: str = None):
+async def extension_ping(v: str = None, x_session_token: str = Header(None), x_server_key: str = Header(None)):
+    if x_server_key != SERVER_AUTH_KEY:
+        return {"status": "ignored"}
     global _last_extension_ping
+    if ACTIVE_SESSION_TOKENS and x_session_token not in ACTIVE_SESSION_TOKENS:
+        return {"status": "ignored"}
     if v != "0.2.4":
         return {"status": "ignored"}
         
@@ -188,7 +234,9 @@ class ImageModel(BaseModel):
     base64: str
 
 @app.post("/extension/save-image")
-async def save_image(data: ImageModel):
+async def save_image(data: ImageModel, x_session_token: str = Header(None), x_server_key: str = Header(None)):
+    verify_server_key(x_server_key)
+    verify_session(x_session_token)
     import base64
     try:
         header, encoded = data.base64.split(",", 1)
@@ -414,7 +462,8 @@ class ToolModel(BaseModel):
     tool_call: str
 
 @app.post("/set-workspace")
-async def set_workspace(data: WorkspaceModel):
+async def set_workspace(data: WorkspaceModel, x_server_key: str = Header(None)):
+    verify_server_key(x_server_key)
     global WORKSPACE_DIR
     new_path = data.path.strip()
     if new_path and os.path.exists(new_path):
@@ -424,7 +473,8 @@ async def set_workspace(data: WorkspaceModel):
     raise HTTPException(status_code=400, detail="Invalid workspace path")
 
 @app.get("/status")
-async def get_status():
+async def get_status(x_server_key: str = Header(None)):
+    verify_server_key(x_server_key)
     active_procs = []
     for pid, data in BACKGROUND_PROCESSES.items():
         recent_logs = list(data['logs'])[-5:] 
@@ -497,7 +547,9 @@ def _short_preview(output: str, max_len: int = 90) -> str:
 
 
 @app.post("/extension/run-tool")
-async def run_tool(data: ToolModel):
+async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_server_key: str = Header(None)):
+    verify_server_key(x_server_key)
+    verify_session(x_session_token)
     global WORKSPACE_DIR
     tool_raw = data.tool_call
 
