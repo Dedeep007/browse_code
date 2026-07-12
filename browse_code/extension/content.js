@@ -349,42 +349,6 @@ function trackResponse(initialText) {
 
         // If text has not changed for 2.5 seconds (5 ticks), assume generation is complete!
         if (unchangedTicks > 4) {
-            
-            // Auto-save generated images
-            try {
-                // Find all images on the page that haven't been processed yet
-                // (Looking at the whole document is safer because Gemini places generated images outside the text container)
-                const images = document.querySelectorAll('img:not([data-agent-processed="true"])');
-                for (const img of images) {
-                    if (img.dataset.agentProcessed) continue;
-                        img.dataset.agentProcessed = "true";
-                        
-                        // Filter out icons, avatars, and SVGs
-                        if (img.src.includes('.svg') || img.src.includes('avatar') || img.src.includes('favicon')) continue;
-                        if (img.width > 0 && img.width < 100) continue; 
-                        
-                        fetch(img.src)
-                            .then(res => res.blob())
-                            .then(blob => {
-                                const reader = new FileReader();
-                                reader.onloadend = () => {
-                                    fetch(`${LOCAL_SERVER}/extension/save-image`, {
-                                        method: 'POST',
-                                        headers: { 'Content-Type': 'application/json' },
-                                        body: JSON.stringify({ base64: reader.result })
-                                    }).then(res => res.json()).then(data => {
-                                        if (data.status === 'ok') {
-                                            messageQueue.push(`[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`);
-                                        }
-                                    }).catch(err => console.error(err));
-                                };
-                                reader.readAsDataURL(blob);
-                            }).catch(err => console.error("Failed to fetch image blob", err));
-                    }
-                }
-            } catch (err) {
-                console.error("Image processing error", err);
-            }
 
             clearInterval(trackInterval);
             lastContainer.setAttribute('data-agent-processed', 'true');
@@ -423,3 +387,46 @@ function trackResponse(initialText) {
         }
     }, 500);
 }
+
+// Global image scanner: Generated images often arrive asynchronously AFTER text finishes.
+setInterval(() => {
+    try {
+        const images = document.querySelectorAll('img:not([data-agent-processed="true"])');
+        for (const img of images) {
+            img.dataset.agentProcessed = "true";
+            
+            // Filter out UI icons, avatars, and SVGs
+            if (img.src.includes('.svg') || img.src.includes('avatar') || img.src.includes('favicon') || img.src.includes('logo')) continue;
+            
+            const processImg = () => {
+                if (img.width > 0 && img.width < 100) return; // Skip tiny icons
+                
+                fetch(img.src)
+                    .then(res => res.blob())
+                    .then(blob => {
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                            fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ base64: reader.result })
+                            }).then(res => res.json()).then(data => {
+                                if (data.status === 'ok') {
+                                    messageQueue.push(`[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`);
+                                }
+                            }).catch(err => console.error(err));
+                        };
+                        reader.readAsDataURL(blob);
+                    }).catch(err => console.error("Failed to fetch image blob", err));
+            };
+            
+            if (img.src.startsWith('blob:') || img.complete) {
+                processImg();
+            } else {
+                img.addEventListener('load', processImg, {once: true});
+            }
+        }
+    } catch (err) {
+        console.error("Image processing error", err);
+    }
+}, 2000);
