@@ -197,6 +197,8 @@ async def save_image(data: ImageModel):
             ext = "jpg"
         elif "webp" in header:
             ext = "webp"
+        elif "svg" in header:
+            ext = "svg"
             
         image_data = base64.b64decode(encoded)
         creations_dir = os.path.join(WORKSPACE_DIR, "agent-creations")

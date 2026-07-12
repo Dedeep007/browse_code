@@ -18,6 +18,7 @@
         "*://*.chatgpt.com/*",
         "*://gemini.google.com/*",
         "*://*.claude.ai/*",
+        "*://*.claudemcpcontent.com/*",
         "*://*.huggingface.co/*"
       ],
       "js": ["content.js"]

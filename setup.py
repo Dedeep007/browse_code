@@ -2,7 +2,7 @@ from setuptools import setup, find_packages
 
 setup(
     name="browse_code",
-    version="0.2.23",
+    version="0.2.24",
     description="Turn any AI chatbot into an autonomous coding agent",
     long_description=open("README.md").read(),
     long_description_content_type="text/markdown",
