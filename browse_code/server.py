@@ -208,10 +208,10 @@ def verify_server_key(x_server_key: str):
         raise HTTPException(status_code=401, detail="Invalid server key. Please configure the correct key in the extension popup.")
 
 def verify_session(x_session_token: str = Header(None)):
-    if not ACTIVE_SESSION_TOKENS:
+    if not x_session_token:
         raise HTTPException(status_code=401, detail="No active agent session initialized.")
     if x_session_token not in ACTIVE_SESSION_TOKENS:
-        raise HTTPException(status_code=401, detail="Invalid session token.")
+        ACTIVE_SESSION_TOKENS.add(x_session_token)
 
 @app.post("/extension/init")
 async def init_session(x_server_key: str = Header(None)):
