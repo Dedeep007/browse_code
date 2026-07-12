@@ -458,9 +458,10 @@ function trackResponse(initialText) {
 // Global image scanner: Generated images often arrive asynchronously AFTER text finishes.
 setInterval(() => {
     try {
-        const images = document.querySelectorAll('img:not([data-agent-processed="true"])');
+        const images = document.querySelectorAll('img');
         for (const img of images) {
-            img.dataset.agentProcessed = "true";
+            if (img.dataset.agentProcessedSrc === img.src) continue;
+            img.dataset.agentProcessedSrc = img.src;
             
             // Filter out UI icons, avatars, and SVGs
             if (img.src.includes('.svg') || img.src.includes('avatar') || img.src.includes('favicon') || img.src.includes('logo')) continue;
