@@ -352,12 +352,11 @@ function trackResponse(initialText) {
             
             // Auto-save generated images
             try {
-                const responseBlocks = document.querySelectorAll(PLATFORM.responseContainer);
-                if (responseBlocks.length > 0) {
-                    const latestBlock = responseBlocks[responseBlocks.length - 1];
-                    const images = latestBlock.querySelectorAll('img');
-                    for (const img of images) {
-                        if (img.dataset.agentProcessed) continue;
+                // Find all images on the page that haven't been processed yet
+                // (Looking at the whole document is safer because Gemini places generated images outside the text container)
+                const images = document.querySelectorAll('img:not([data-agent-processed="true"])');
+                for (const img of images) {
+                    if (img.dataset.agentProcessed) continue;
                         img.dataset.agentProcessed = "true";
                         
                         // Filter out icons, avatars, and SVGs
