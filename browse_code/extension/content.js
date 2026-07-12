@@ -223,12 +223,11 @@ window.addEventListener('message', (event) => {
             messageQueue.push(event.data.message);
         }
     } else if (event.data && event.data.type === 'AGENT_BRIDGE_FORWARD_IMAGE') {
-        if (!sessionToken || !serverKey) return;
+        if (!serverKey) return;
         fetch(`${LOCAL_SERVER}/extension/save-image`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
-                'X-Session-Token': sessionToken,
                 'X-Server-Key': serverKey
             },
             body: JSON.stringify({ base64: event.data.base64 })
@@ -476,7 +475,7 @@ setInterval(() => {
                         reader.readAsDataURL(blob);
                     });
                 } else {
-                    if (!sessionToken || !serverKey) return;
+                    if (!serverKey) return;
                     fetch(img.src)
                         .then(res => res.blob())
                         .then(blob => {
@@ -486,7 +485,6 @@ setInterval(() => {
                                     method: 'POST',
                                     headers: { 
                                         'Content-Type': 'application/json',
-                                        'X-Session-Token': sessionToken,
                                         'X-Server-Key': serverKey
                                     },
                                     body: JSON.stringify({ base64: reader.result })
@@ -523,12 +521,11 @@ setInterval(() => {
             if (window !== window.top) {
                 window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
             } else {
-                if (!sessionToken || !serverKey) return;
+                if (!serverKey) return;
                 fetch(`${LOCAL_SERVER}/extension/save-image`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
-                        'X-Session-Token': sessionToken,
                         'X-Server-Key': serverKey
                     },
                     body: JSON.stringify({ base64: base64 })
