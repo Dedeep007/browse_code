@@ -180,6 +180,16 @@ def print_startup_banner(workspace: str, host: str, port: int):
     key_pad = max(0, width - len(key_text))
     print(f"{C_HEADER}│{C_RESET} {C_MUTED}{key_label}{C_RESET}  {C_OK}{key_status}{C_RESET}{' ' * key_pad}{C_HEADER}│{C_RESET}")
     
+    try:
+        from . import __version__
+        ver_label = "Version"
+        ver_status = __version__
+        ver_text = f" {ver_label}  {ver_status}"
+        ver_pad = max(0, width - len(ver_text))
+        print(f"{C_HEADER}│{C_RESET} {C_MUTED}{ver_label}{C_RESET}  {ver_status}{' ' * ver_pad}{C_HEADER}│{C_RESET}")
+    except Exception:
+        pass
+        
     print(f"{C_HEADER}╰{'─' * width}╯{C_RESET}")
     print()
 
