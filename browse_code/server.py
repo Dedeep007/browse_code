@@ -242,8 +242,9 @@ class ImageModel(BaseModel):
     base64: str
 
 @app.post("/extension/save-image")
-async def save_image(data: ImageModel, x_server_key: str = Header(None)):
+async def save_image(data: ImageModel, x_session_token: str = Header(None), x_server_key: str = Header(None)):
     verify_server_key(x_server_key)
+    verify_session(x_session_token)
     import base64
     try:
         header, encoded = data.base64.split(",", 1)

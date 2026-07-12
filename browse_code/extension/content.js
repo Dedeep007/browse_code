@@ -2,7 +2,7 @@ const LOCAL_SERVER = "http://127.0.0.1:5505";
 const hostname = window.location.hostname;
 
 let PLATFORM = {};
-let sessionToken = null;
+let sessionToken = sessionStorage.getItem('agentSessionToken') || null;
 let serverKey = null;
 
 chrome.storage.local.get(['serverKey'], (res) => {
@@ -205,6 +205,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             .then(data => {
                 if (data.token) {
                     sessionToken = data.token;
+                    sessionStorage.setItem('agentSessionToken', sessionToken);
                     messageCount = 0;
                     startNewChat()
                         .then(() => injectAndSend(SYSTEM_PROMPT))
@@ -223,11 +224,12 @@ window.addEventListener('message', (event) => {
             messageQueue.push(event.data.message);
         }
     } else if (event.data && event.data.type === 'AGENT_BRIDGE_FORWARD_IMAGE') {
-        if (!serverKey) return;
+        if (!sessionToken || !serverKey) return;
         fetch(`${LOCAL_SERVER}/extension/save-image`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
+                'X-Session-Token': sessionToken,
                 'X-Server-Key': serverKey
             },
             body: JSON.stringify({ base64: event.data.base64 })
@@ -475,7 +477,7 @@ setInterval(() => {
                         reader.readAsDataURL(blob);
                     });
                 } else {
-                    if (!serverKey) return;
+                    if (!sessionToken || !serverKey) return;
                     fetch(img.src)
                         .then(res => res.blob())
                         .then(blob => {
@@ -485,6 +487,7 @@ setInterval(() => {
                                     method: 'POST',
                                     headers: { 
                                         'Content-Type': 'application/json',
+                                        'X-Session-Token': sessionToken,
                                         'X-Server-Key': serverKey
                                     },
                                     body: JSON.stringify({ base64: reader.result })
@@ -521,11 +524,12 @@ setInterval(() => {
             if (window !== window.top) {
                 window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
             } else {
-                if (!serverKey) return;
+                if (!sessionToken || !serverKey) return;
                 fetch(`${LOCAL_SERVER}/extension/save-image`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
+                        'X-Session-Token': sessionToken,
                         'X-Server-Key': serverKey
                     },
                     body: JSON.stringify({ base64: base64 })
