@@ -36,34 +36,41 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     });
 
-    initBtn.addEventListener('click', () => {
+    const handleAgentAction = (btn, action, loadingText, defaultText) => {
         const path = dirInput.value.trim();
         if (!path) {
-            initBtn.innerText = 'Workspace directory required!';
-            setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
+            btn.innerText = 'Workspace directory required!';
+            setTimeout(() => btn.innerText = defaultText, 3000);
             return;
         }
 
-        initBtn.innerText = 'Initializing...';
+        btn.innerText = loadingText;
         chrome.tabs.query({active: true, currentWindow: true}, (tabs) => {
             const activeTab = tabs[0];
             const validUrls = ['chatgpt.com', 'gemini.google.com', 'claude.ai', 'huggingface.co'];
             
             if (activeTab && validUrls.some(url => activeTab.url.includes(url))) {
-                chrome.tabs.sendMessage(activeTab.id, { action: "INITIALIZE_AGENT" }, () => {
+                chrome.tabs.sendMessage(activeTab.id, { action: action }, () => {
                     if (chrome.runtime.lastError) {
-                        initBtn.innerText = 'Error: Refresh Tab First!';
-                        setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
+                        btn.innerText = 'Error: Refresh Tab First!';
+                        setTimeout(() => btn.innerText = defaultText, 3000);
                     } else {
-                        initBtn.innerText = 'Initialize Agent in Chat';
+                        btn.innerText = defaultText;
                     }
                 });
             } else {
-                initBtn.innerText = 'Not a valid AI chat tab';
-                setTimeout(() => initBtn.innerText = 'Initialize Agent in Chat', 3000);
+                btn.innerText = 'Not a valid AI chat tab';
+                setTimeout(() => btn.innerText = defaultText, 3000);
             }
         });
-    });
+    };
+
+    initBtn.addEventListener('click', () => handleAgentAction(initBtn, 'INITIALIZE_AGENT', 'Initializing...', 'Start Agent Session'));
+    
+    const resumeBtn = document.getElementById('resume-btn');
+    if (resumeBtn) {
+        resumeBtn.addEventListener('click', () => handleAgentAction(resumeBtn, 'RESUME_AGENT', 'Resuming...', 'Resume Session'));
+    }
 
     function syncWithServer(path, key) {
         if (!path || !key) return;

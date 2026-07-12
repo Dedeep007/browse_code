@@ -192,7 +192,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
 
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: "received" });
-    if (request.action === "INITIALIZE_AGENT") {
+    if (request.action === "INITIALIZE_AGENT" || request.action === "RESUME_AGENT") {
         if (!serverKey) {
             console.error("No Server Key configured. Please add it in the extension popup.");
             return;
@@ -207,9 +207,15 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     sessionToken = data.token;
                     sessionStorage.setItem('agentSessionToken', sessionToken);
                     messageCount = 0;
-                    startNewChat()
-                        .then(() => injectAndSend(SYSTEM_PROMPT))
-                        .catch(err => console.error("Initialization sequence failed:", err));
+                    
+                    if (request.action === "INITIALIZE_AGENT") {
+                        startNewChat()
+                            .then(() => injectAndSend(SYSTEM_PROMPT))
+                            .catch(err => console.error("Initialization sequence failed:", err));
+                    } else {
+                        console.log("Agent session resumed successfully!");
+                        messageQueue.push(`[System - Info]: Backend agent bridge resumed and listening. Ready to execute commands!`);
+                    }
                 }
             })
             .catch(err => console.error("Failed to initialize session:", err));
