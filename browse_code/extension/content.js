@@ -476,35 +476,42 @@ setInterval(() => {
                 // If it's not a blob (native AI image) and is small/hidden, skip it
                 if (!img.src.startsWith('blob:') && (img.width < 100 || img.height < 100)) return;
                 
-                if (window !== window.top) {
-                    fetch(img.src).then(res => res.blob()).then(blob => {
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                            window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: reader.result }, '*');
-                        };
-                        reader.readAsDataURL(blob);
-                    });
-                } else {
-                    if (!sessionToken || !serverKey) return;
+                const sendBase64 = (base64) => {
+                    if (window !== window.top) {
+                        window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
+                    } else {
+                        if (!sessionToken || !serverKey) return;
+                        fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                            method: 'POST',
+                            headers: { 
+                                'Content-Type': 'application/json',
+                                'X-Session-Token': sessionToken,
+                                'X-Server-Key': serverKey
+                            },
+                            body: JSON.stringify({ base64: base64 })
+                        }).then(res => res.json()).then(data => {
+                            if (data.status === 'ok') {
+                                messageQueue.push(`[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`);
+                            }
+                        }).catch(err => console.error(err));
+                    }
+                };
+
+                try {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.naturalWidth || img.width;
+                    canvas.height = img.naturalHeight || img.height;
+                    const ctx = canvas.getContext('2d');
+                    ctx.drawImage(img, 0, 0);
+                    const base64 = canvas.toDataURL('image/png');
+                    if (base64 === 'data:,') throw new Error("Canvas is empty");
+                    sendBase64(base64);
+                } catch (e) {
                     fetch(img.src)
                         .then(res => res.blob())
                         .then(blob => {
                             const reader = new FileReader();
-                            reader.onloadend = () => {
-                                fetch(`${LOCAL_SERVER}/extension/save-image`, {
-                                    method: 'POST',
-                                    headers: { 
-                                        'Content-Type': 'application/json',
-                                        'X-Session-Token': sessionToken,
-                                        'X-Server-Key': serverKey
-                                    },
-                                    body: JSON.stringify({ base64: reader.result })
-                                }).then(res => res.json()).then(data => {
-                                    if (data.status === 'ok') {
-                                        messageQueue.push(`[System - Image Saved]: An image you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`);
-                                    }
-                                }).catch(err => console.error(err));
-                            };
+                            reader.onloadend = () => sendBase64(reader.result);
                             reader.readAsDataURL(blob);
                         }).catch(err => console.error("Failed to fetch image blob", err));
                 }
