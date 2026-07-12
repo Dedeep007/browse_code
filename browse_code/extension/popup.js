@@ -1,7 +1,6 @@
 document.addEventListener('DOMContentLoaded', () => {
     const dirInput = document.getElementById('dir-input');
     const injectNInput = document.getElementById('inject-n-input');
-    const serverKeyInput = document.getElementById('server-key-input');
     const saveBtn = document.getElementById('save-btn');
     const initBtn = document.getElementById('init-btn');
     const processList = document.getElementById('process-list');
@@ -9,9 +8,6 @@ document.addEventListener('DOMContentLoaded', () => {
     chrome.storage.local.get(['workspaceDir', 'injectN', 'serverKey'], (result) => {
         if (result.workspaceDir) {
             dirInput.value = result.workspaceDir;
-        }
-        if (result.serverKey) {
-            serverKeyInput.value = result.serverKey;
         }
         if (result.workspaceDir && result.serverKey) {
             syncWithServer(result.workspaceDir, result.serverKey);
@@ -23,17 +19,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
     saveBtn.addEventListener('click', () => {
         const path = dirInput.value.trim();
-        const key = serverKeyInput.value.trim();
         let injectN = 10;
         if (injectNInput) {
             const val = parseInt(injectNInput.value, 10);
             if (!isNaN(val)) injectN = val;
         }
         
-        chrome.storage.local.set({ workspaceDir: path, injectN: injectN, serverKey: key }, () => {
-            saveBtn.textContent = "Saved!";
-            setTimeout(() => saveBtn.textContent = "Save Settings", 1500);
-            syncWithServer(path, key);
+        chrome.storage.local.get(['serverKey'], (result) => {
+            chrome.storage.local.set({ workspaceDir: path, injectN: injectN }, () => {
+                saveBtn.textContent = "Saved!";
+                setTimeout(() => saveBtn.textContent = "Save Settings", 1500);
+                if (result.serverKey) {
+                    syncWithServer(path, result.serverKey);
+                }
+            });
         });
     });
 

@@ -55,13 +55,18 @@ spoofScript.onload = function () { this.remove(); };
 
 // Heartbeat: ping the server every 5 seconds so it knows the extension is connected
 function pingServer() {
-    if (!sessionToken || !serverKey) return;
-    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, {
-        headers: { 
-            'X-Session-Token': sessionToken,
-            'X-Server-Key': serverKey
-        }
-    }).catch(() => {});
+    const headers = {};
+    if (sessionToken) headers['X-Session-Token'] = sessionToken;
+    
+    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
+        .then(res => res.json())
+        .then(data => {
+            if (data.key && data.key !== serverKey) {
+                serverKey = data.key;
+                chrome.storage.local.set({ serverKey: serverKey });
+            }
+        })
+        .catch(() => {});
 }
 pingServer();
 setInterval(pingServer, 5000);

@@ -59,11 +59,11 @@ async def lifespan(app: FastAPI):
     task.cancel()
 
 
-app = FastAPI(title="Agent Bridge Backend", lifespan=lifespan)
+app = FastAPI(title="Agent Bridge", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origin_regex=r"https://.*\.claudemcpcontent\.com|https://claude\.ai|https://gemini\.google\.com|https://chatgpt\.com|https://chat\.openai\.com|https://huggingface\.co|chrome-extension://.*|http://localhost:.*|http://127\.0\.0\.1:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -215,20 +215,16 @@ def is_extension_connected():
     return (time.time() - _last_extension_ping) < _HEARTBEAT_TIMEOUT
 
 @app.get("/extension/ping")
-async def extension_ping(v: str = None, x_session_token: str = Header(None), x_server_key: str = Header(None)):
-    if x_server_key != SERVER_AUTH_KEY:
-        return {"status": "ignored"}
+async def extension_ping(v: str = None, x_session_token: str = Header(None)):
     global _last_extension_ping
-    if ACTIVE_SESSION_TOKENS and x_session_token not in ACTIVE_SESSION_TOKENS:
-        return {"status": "ignored"}
-    if v != "0.2.4":
-        return {"status": "ignored"}
-        
-    was_connected = is_extension_connected()
-    _last_extension_ping = time.time()
-    if not was_connected:
-        print(f"\n{C_OK}[+] Extension connected{C_RESET}")
-    return {"status": "ok"}
+    
+    if (not ACTIVE_SESSION_TOKENS) or (x_session_token in ACTIVE_SESSION_TOKENS):
+        was_connected = is_extension_connected()
+        _last_extension_ping = time.time()
+        if not was_connected:
+            print(f"\n{C_OK}[+] Extension connected{C_RESET}")
+            
+    return {"status": "ok", "key": SERVER_AUTH_KEY}
 
 class ImageModel(BaseModel):
     base64: str
