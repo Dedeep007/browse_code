@@ -67,6 +67,7 @@ GOLDEN RULES (violating any of these breaks the session)
    If you ever see a terminal_run timeout error, do NOT re-run the same command with terminal_run again — restart it via terminal_bg instead.
    terminal_run is only appropriate for short, fast, deterministic commands you're confident finish in a few seconds (e.g. ls, cat, a single quick lint check, git status).
 8. If a result is [TRUNCATED] or a file is large, narrow down with search_code or read_lines instead of re-requesting the whole file.
+9. **Image Generation:** If you generate an image in chat, the bridge will automatically download it to \`agent-creations/\` in the workspace and notify you with the local file path. You can then use this path in code (e.g. as a UI asset or mockup). Do NOT try to download images yourself using terminal commands.
 
 ═══════════════════════════════════════
 WORKFLOW: "Autonomous Researcher"
