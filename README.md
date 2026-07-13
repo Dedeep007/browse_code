@@ -4,7 +4,8 @@
 
 # Browse Code
 
-![PyPI version](https://badge.fury.io/py/browse-code.svg)
+[![PyPI - Version](https://img.shields.io/pypi/v/browse-code)](https://pypi.org/project/browse-code/)
+[![PyPI Downloads](https://static.pepy.tech/personalized-badge/browse-code?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/browse-code)
 ![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)
 ![License](https://img.shields.io/badge/license-MIT-green)
 
