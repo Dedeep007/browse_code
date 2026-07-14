@@ -591,7 +591,6 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
                             tree.append(rel_path)
                 return tree
             
-            import asyncio
             tree = await asyncio.to_thread(do_walk)
             result = {"output": truncate_output("\n".join(tree) if tree else "Directory is empty.")}
 
@@ -633,7 +632,6 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
                         except: pass
                 return results
 
-            import asyncio
             results = await asyncio.to_thread(do_search)
             result = {"output": truncate_output("\n".join(results) if results else "No matches found.")}
 
