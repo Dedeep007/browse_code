@@ -194,7 +194,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     sendResponse({ status: "received" });
     if (request.action === "INITIALIZE_AGENT" || request.action === "RESUME_AGENT") {
         if (!serverKey) {
-            console.error("No Server Key configured. Please add it in the extension popup.");
+            console.warn("No Server Key configured. Please add it in the extension popup.");
             return;
         }
         fetch(`${LOCAL_SERVER}/extension/init`, { 
@@ -211,14 +211,14 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
                     if (request.action === "INITIALIZE_AGENT") {
                         startNewChat()
                             .then(() => injectAndSend(SYSTEM_PROMPT))
-                            .catch(err => console.error("Initialization sequence failed:", err));
+                            .catch(err => console.warn("Initialization sequence failed:", err));
                     } else {
                         console.log("Agent session resumed successfully!");
                         messageQueue.push(`[System - Info]: Backend agent bridge resumed and listening. Ready to execute commands!`);
                     }
                 }
             })
-            .catch(err => console.error("Failed to initialize session:", err));
+            .catch(err => console.warn("Failed to initialize session:", err));
     }
     return true;
 });
@@ -454,7 +454,7 @@ function trackResponse(initialText) {
 
                     messageQueue.push(combinedFeedback);
                 } catch (err) {
-                    messageQueue.push(`\n[System - Error]: Tool execution failed. Ensure your Python backend is running.`);
+                    messageQueue.push(`\n[System - Error]: Browse Code bridge is disconnected.`);
                 }
             }
         }
@@ -559,10 +559,10 @@ setInterval(() => {
                         const msg = `[System - Image Saved]: An SVG you generated was automatically downloaded and saved to: ${data.path}\nYou can use this file path in your code if you need to.`;
                         messageQueue.push(msg);
                     }
-                }).catch(err => console.error(err));
+                }).catch(err => console.warn(err));
             }
         }
     } catch (err) {
-        console.error("Image processing error", err);
+        console.warn("Image processing error", err);
     }
 }, 2000);
