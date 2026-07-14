@@ -19,7 +19,7 @@ if (hostname.includes('gemini.google.com')) {
         name: "Gemini",
         inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"], .ql-editor, textarea, input',
         sendBtn: 'button[aria-label="Send message"], button[aria-label="Send"], button[mattooltip="Send message"], button[mattooltip="Send"]',
-        stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"], button[mattooltip*="Stop"]',
+        stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"], button[mattooltip="Stop generating"], button[mattooltip="Stop"]',
         responseContainer: 'message-content, model-response, .model-response-text'
     };
 } else if (hostname.includes('claude.ai')) {
@@ -27,23 +27,23 @@ if (hostname.includes('gemini.google.com')) {
         name: "Claude",
         inputBox: '.ProseMirror[contenteditable="true"]',
         sendBtn: 'button[aria-label="Send Message"], button[aria-label="Send message"]',
-        stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"]',
+        stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"]',
         responseContainer: '.font-claude-response, .font-claude-message'
     };
 } else if (hostname.includes('huggingface.co')) {
     PLATFORM = {
         name: "HuggingFace",
-        inputBox: 'input[name="prompt"]',
+        inputBox: 'input[name="prompt"], textarea[name="prompt"]',
         sendBtn: 'button[type="submit"]',
-        stopBtn: 'button[aria-label*="Stop"], button:contains("Stop")',
+        stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"], button:contains("Stop")',
         responseContainer: '.prose, .markdown, .break-words, [class*="message"]'
     };
 } else {
     PLATFORM = {
         name: "ChatGPT",
         inputBox: '#prompt-textarea',
-        sendBtn: '[data-testid="send-button"], button[data-testid*="send"]',
-        stopBtn: 'button[aria-label*="Stop"], button[data-testid*="stop"]',
+        sendBtn: '[data-testid="send-button"]',
+        stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"], [data-testid="stop-button"]',
         responseContainer: '.markdown, .prose'
     };
 }
