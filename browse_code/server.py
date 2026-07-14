@@ -156,7 +156,10 @@ def load_or_create_server_key():
 SERVER_AUTH_KEY = load_or_create_server_key()
 
 def print_startup_banner(workspace: str, host: str, port: int):
-    width = 78
+    terminal_width = shutil.get_terminal_size((80, 20)).columns
+    # Clamp width between 60 and 100 to keep it readable, or max out at terminal width
+    width = min(max(60, terminal_width - 2), 100)
+    
     title = " Agent Bridge Backend "
     pad = width - len(title)
     left, right = pad // 2, pad - pad // 2
@@ -458,6 +461,7 @@ def stream_process_output(pid: str, process: subprocess.Popen):
         BACKGROUND_PROCESSES[pid]['status'] = 'exited'
 
 def secure_path(path: str) -> str:
+    path = path.lstrip("/\\")
     filepath = os.path.abspath(os.path.join(WORKSPACE_DIR, path))
     if not filepath.startswith(os.path.abspath(WORKSPACE_DIR)):
         raise HTTPException(status_code=400, detail="Security Error: Path traversal detected.")
