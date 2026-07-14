@@ -26,7 +26,7 @@ if (hostname.includes('gemini.google.com')) {
     PLATFORM = {
         name: "Claude",
         inputBox: '.ProseMirror[contenteditable="true"]',
-        sendBtn: 'button[aria-label*="Send"], button[aria-label*="send"]',
+        sendBtn: 'button[aria-label="Send Message"], button[aria-label="Send message"]',
         stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"]',
         responseContainer: '.font-claude-response, .font-claude-message'
     };
