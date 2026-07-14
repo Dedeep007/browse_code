@@ -18,7 +18,7 @@ if (hostname.includes('gemini.google.com')) {
     PLATFORM = {
         name: "Gemini",
         inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"], .ql-editor, textarea, input',
-        sendBtn: 'button[aria-label*="Send"], button[aria-label*="send"], button[mattooltip*="Send"]',
+        sendBtn: 'button[aria-label="Send message"], button[aria-label="Send"], button[mattooltip="Send message"], button[mattooltip="Send"]',
         stopBtn: 'button[aria-label*="Stop"], button[aria-label*="stop"], button[mattooltip*="Stop"]',
         responseContainer: 'message-content, model-response, .model-response-text'
     };

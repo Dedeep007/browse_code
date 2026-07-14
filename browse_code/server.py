@@ -768,4 +768,11 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="127.0.0.1", port=5505, access_log=False)
+    import sys
+    try:
+        uvicorn.run(app, host="127.0.0.1", port=5505, access_log=False)
+    except (KeyboardInterrupt, SystemExit):
+        pass
+    except Exception:
+        pass
+    sys.exit(0)
