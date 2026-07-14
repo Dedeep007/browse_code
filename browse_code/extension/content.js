@@ -369,6 +369,22 @@ function processQueue() {
     });
 }
 
+function getDeepText(node) {
+    if (!node) return "";
+    let text = '';
+    if (node.nodeType === Node.TEXT_NODE) {
+        text += node.textContent;
+    } else if (node.nodeType === Node.ELEMENT_NODE) {
+        if (node.shadowRoot) {
+            text += getDeepText(node.shadowRoot);
+        }
+        for (let child of node.childNodes) {
+            text += getDeepText(child);
+        }
+    }
+    return text;
+}
+
 // Primary observer loop: checks every 1 second
 setInterval(() => {
     processQueue();
@@ -383,8 +399,8 @@ setInterval(() => {
     const lastContainer = containers[containers.length - 1];
     if (lastContainer.hasAttribute('data-agent-processed')) return;
 
-    // Grab the very last message in the chat using textContent to avoid layout thrashing
-    const currentText = lastContainer.textContent || "";
+    // Grab the very last message in the chat using getDeepText to pierce Shadow DOM (Gemini code blocks)
+    const currentText = getDeepText(lastContainer);
 
     // If the LLM has generated a closing tool tag that we haven't processed yet, lock it in and wait for it to finish typing
     if (currentText.includes("</tool>")) {
@@ -406,7 +422,7 @@ function trackResponse(initialText) {
         const lastContainer = containers.length > 0 ? containers[containers.length - 1] : null;
         if (!lastContainer) return;
 
-        const currentText = lastContainer.textContent || "";
+        const currentText = getDeepText(lastContainer);
 
         // Check if the LLM is still typing
         const isGenerating = PLATFORM.stopBtn && document.querySelector(PLATFORM.stopBtn);
