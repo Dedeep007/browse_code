@@ -581,12 +581,18 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
         if view_match:
             sub_dir = view_match.group(1).strip()
             target_dir = secure_path(sub_dir) if sub_dir else WORKSPACE_DIR
-            tree = []
-            for root, dirs, files in os.walk(target_dir):
-                for f in files:
-                    rel_path = os.path.relpath(os.path.join(root, f), WORKSPACE_DIR)
-                    if not any(part.startswith('.') or part == 'node_modules' or part == '__pycache__' for part in rel_path.split(os.sep)):
-                        tree.append(rel_path)
+            
+            def do_walk():
+                tree = []
+                for root, dirs, files in os.walk(target_dir):
+                    for f in files:
+                        rel_path = os.path.relpath(os.path.join(root, f), WORKSPACE_DIR)
+                        if not any(part.startswith('.') or part == 'node_modules' or part == '__pycache__' for part in rel_path.split(os.sep)):
+                            tree.append(rel_path)
+                return tree
+            
+            import asyncio
+            tree = await asyncio.to_thread(do_walk)
             result = {"output": truncate_output("\n".join(tree) if tree else "Directory is empty.")}
 
         elif read_match:
@@ -612,17 +618,23 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
         elif search_code_match:
             query, sub_dir = search_code_match.group(1).strip(), search_code_match.group(2).strip()
             target_dir = secure_path(sub_dir) if sub_dir else WORKSPACE_DIR
-            results = []
-            for root, dirs, files in os.walk(target_dir):
-                if any(part.startswith('.') or part == 'node_modules' for part in root.split(os.sep)): continue
-                for f in files:
-                    filepath = os.path.join(root, f)
-                    rel_path = os.path.relpath(filepath, WORKSPACE_DIR)
-                    try:
-                        with open(filepath, 'r', encoding='utf-8') as file:
-                            for line_num, line in enumerate(file, 1):
-                                if query in line: results.append(f"{rel_path}:{line_num}: {line.strip()}")
-                    except: pass
+            
+            def do_search():
+                results = []
+                for root, dirs, files in os.walk(target_dir):
+                    if any(part.startswith('.') or part == 'node_modules' for part in root.split(os.sep)): continue
+                    for f in files:
+                        filepath = os.path.join(root, f)
+                        rel_path = os.path.relpath(filepath, WORKSPACE_DIR)
+                        try:
+                            with open(filepath, 'r', encoding='utf-8') as file:
+                                for line_num, line in enumerate(file, 1):
+                                    if query in line: results.append(f"{rel_path}:{line_num}: {line.strip()}")
+                        except: pass
+                return results
+
+            import asyncio
+            results = await asyncio.to_thread(do_search)
             result = {"output": truncate_output("\n".join(results) if results else "No matches found.")}
 
         elif write_match:

@@ -303,7 +303,7 @@ async function injectAndSend(promptText) {
     inputBox.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
     inputBox.dispatchEvent(new Event('change', { bubbles: true, composed: true }));
 
-    await new Promise(r => setTimeout(r, 800));
+    await new Promise(r => setTimeout(r, 200));
 
     const trySend = () => {
         const btn = document.querySelector(PLATFORM.sendBtn);
@@ -409,6 +409,8 @@ function trackResponse(initialText) {
         const currentText = lastContainer.textContent || "";
 
         // Check if the LLM is still typing
+        const isGenerating = PLATFORM.stopBtn && document.querySelector(PLATFORM.stopBtn);
+        
         if (currentText.length > previousText.length) {
             previousText = currentText;
             unchangedTicks = 0;
@@ -416,12 +418,12 @@ function trackResponse(initialText) {
             unchangedTicks++;
         }
 
-        // If text has not changed for 2.5 seconds (5 ticks), assume generation is complete!
-        if (unchangedTicks > 4) {
-
+        // If Stop button disappeared OR text hasn't changed for 2.5 seconds (fallback)
+        if (!isGenerating || unchangedTicks > 4) {
             clearInterval(trackInterval);
             lastContainer.setAttribute('data-agent-processed', 'true');
             isWaitingForLLM = false; // UNLOCK IMMEDIATELY to prevent deadlocks from long-running tools
+            
             const toolMatches = currentText.match(/<tool=[\s\S]*?<\/tool>/g);
             if (toolMatches && toolMatches.length > 0) {
                 try {
