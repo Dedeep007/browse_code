@@ -623,12 +623,43 @@ async def run_tool(data: ToolModel, x_session_token: str = Header(None), x_serve
             target_dir = secure_path(sub_dir) if sub_dir else WORKSPACE_DIR
             
             def do_search():
+                import subprocess
+                try:
+                    res = subprocess.run(['rg', '-n', '-F', query], cwd=target_dir, capture_output=True, text=True)
+                    if res.returncode in (0, 1):
+                        lines = []
+                        for line in res.stdout.splitlines():
+                            parts = line.split(':', 2)
+                            if len(parts) >= 3:
+                                file_path = os.path.join(target_dir, parts[0])
+                                rel_path = os.path.relpath(file_path, WORKSPACE_DIR).replace('\\', '/')
+                                lines.append(f"{rel_path}:{parts[1]}: {parts[2].strip()}")
+                        return lines
+                except Exception:
+                    pass
+
+                try:
+                    is_git = subprocess.run(['git', 'rev-parse', '--is-inside-work-tree'], cwd=target_dir, capture_output=True, text=True)
+                    if is_git.returncode == 0 and is_git.stdout.strip() == 'true':
+                        res = subprocess.run(['git', 'grep', '-nI', '--untracked', '-F', '-e', query], cwd=target_dir, capture_output=True, text=True)
+                        if res.returncode in (0, 1):
+                            lines = []
+                            for line in res.stdout.splitlines():
+                                parts = line.split(':', 2)
+                                if len(parts) >= 3:
+                                    file_path = os.path.join(target_dir, parts[0])
+                                    rel_path = os.path.relpath(file_path, WORKSPACE_DIR).replace('\\', '/')
+                                    lines.append(f"{rel_path}:{parts[1]}: {parts[2].strip()}")
+                            return lines
+                except Exception:
+                    pass
+
                 results = []
                 for root, dirs, files in os.walk(target_dir):
                     if any(part.startswith('.') or part == 'node_modules' for part in root.split(os.sep)): continue
                     for f in files:
                         filepath = os.path.join(root, f)
-                        rel_path = os.path.relpath(filepath, WORKSPACE_DIR)
+                        rel_path = os.path.relpath(filepath, WORKSPACE_DIR).replace('\\', '/')
                         try:
                             with open(filepath, 'r', encoding='utf-8') as file:
                                 for line_num, line in enumerate(file, 1):
