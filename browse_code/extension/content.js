@@ -387,6 +387,7 @@ async function injectAndSend(promptText) {
         
         // If the user switched tabs, React might suspend and the button stays disabled.
         // Setup an aggressive retry loop that clicks it the moment they focus the tab and React wakes up.
+        // This will poll indefinitely until the text is cleared (sent) or the button is successfully clicked.
         const clickInterval = setInterval(() => {
             const currentText = inputBox.tagName === 'INPUT' || inputBox.tagName === 'TEXTAREA' ? inputBox.value : inputBox.textContent;
             if (!currentText || currentText.length < promptText.length * 0.5) {
@@ -397,8 +398,6 @@ async function injectAndSend(promptText) {
                 clearInterval(clickInterval);
             }
         }, 500);
-        
-        setTimeout(() => clearInterval(clickInterval), 15000);
     }
 }
 
