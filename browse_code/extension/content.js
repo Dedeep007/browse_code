@@ -475,8 +475,8 @@ setInterval(() => {
     // Grab the very last message in the chat using getDeepText to pierce Shadow DOM (Gemini code blocks)
     const currentText = getDeepText(lastContainer);
 
-    // If the LLM has generated a closing tool tag that we haven't processed yet, lock it in and wait for it to finish typing
-    if (currentText.includes("</tool>")) {
+    // If the LLM has generated a tool tag that we haven't processed yet, lock it in and wait for it to finish typing
+    if (currentText.includes("<tool=") || currentText.includes("</tool>")) {
         isWaitingForLLM = true;
         trackResponse(currentText);
     }
@@ -547,6 +547,8 @@ function trackResponse(initialText) {
                 } catch (err) {
                     messageQueue.push(`\n[System - Error]: Browse Code bridge is disconnected.`);
                 }
+            } else if (currentText.includes("<tool=")) {
+                messageQueue.push(`\n[System - Error]: Malformed tool call. You started a <tool=> tag but never closed it with </tool>. Please repeat your entire tool call using the correct format.`);
             }
         }
     }, 500);
