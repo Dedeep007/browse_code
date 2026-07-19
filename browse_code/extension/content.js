@@ -552,6 +552,15 @@ function trackResponse(initialText) {
     }, 500);
 }
 
+function isAgentGenerated(element) {
+    if (window !== window.top) return true; // In iframe (e.g. Claude MCP sandbox), everything is agent generated
+    const inResponse = element.closest(PLATFORM.responseContainer);
+    if (!inResponse) return false;
+    const isUserUpload = element.closest('form, [contenteditable="true"], [data-message-author="user"], .font-user-message, .user-message, user-message, user-query');
+    if (isUserUpload) return false;
+    return true;
+}
+
 // Global image scanner: Generated images often arrive asynchronously AFTER text finishes.
 setInterval(() => {
     try {
@@ -567,6 +576,8 @@ setInterval(() => {
                 // If it's not a blob (native AI image) and is small/hidden, skip it
                 if (!img.src.startsWith('blob:') && (img.width < 100 || img.height < 100)) return;
                 
+                if (!isAgentGenerated(img)) return;
+
                 const sendBase64 = (base64) => {
                     if (window !== window.top) {
                         window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
@@ -624,7 +635,7 @@ setInterval(() => {
                 svg.dataset.agentProcessed = "true";
                 continue;
             }
-            if (svg.classList.contains('icon') || svg.getAttribute('aria-hidden') === 'true') {
+            if (svg.classList.contains('icon') || svg.getAttribute('aria-hidden') === 'true' || !isAgentGenerated(svg)) {
                 svg.dataset.agentProcessed = "true";
                 continue;
             }
