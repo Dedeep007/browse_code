@@ -55,7 +55,7 @@ pip install browse-code
 ```
 
 ### Step 2: Run the CLI
-Navigate to your project directory and run:
+You can run the server from anywhere on your machine:
 ```bash
 bc
 ```
