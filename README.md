@@ -1,11 +1,11 @@
 <p align="center">
-  <img src="logo.png" alt="Browse Code" width="200">
+  <img src="logo.svg" alt="Browse Code" width="200">
 </p>
 
 # Browse Code
 
 [![PyPI - Version](https://img.shields.io/pypi/v/browse-code?style=for-the-badge&color=blue)](https://pypi.org/project/browse-code/)
-[![PyPI Downloads](https://img.shields.io/pepy/dt/browse-code?style=for-the-badge&color=green)](https://pepy.tech/projects/browse-code)
+[![PyPI Downloads](https://img.shields.io/pypi/dm/browse-code?style=for-the-badge&color=green)](https://pypi.org/project/browse-code/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue?style=for-the-badge)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
