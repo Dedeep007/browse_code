@@ -4,7 +4,7 @@
 
 # Browse Code
 
-[![PyPI - Version](https://img.shields.io/pypi/v/browse-code?style=for-the-badge&color=blue)](https://pypi.org/project/browse-code/)
+[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.61-blue?style=for-the-badge)](https://pypi.org/project/browse-code/)
 [![PyPI Downloads](https://img.shields.io/pypi/dm/browse-code?style=for-the-badge&color=green)](https://pypi.org/project/browse-code/)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue?style=for-the-badge)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
