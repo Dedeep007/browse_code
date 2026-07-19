@@ -37,6 +37,23 @@ ASCII_CODE = [
     "╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝"
 ]
 
+ASCII_COMPACT_LEFT = [
+    "   __  ",
+    "  / /  ",
+    " | |   ",
+    " < <   ",
+    " | |   ",
+    "  \\_\\  "
+]
+
+ASCII_COMPACT_RIGHT = [
+    "  __   ",
+    "  \\ \\  ",
+    "   | | ",
+    "   > > ",
+    "   | | ",
+    "  /_/  "
+]
 
 def get_data_dir():
     """Return ~/.browse_code, creating it if needed."""
@@ -74,8 +91,15 @@ def copy_to_clipboard(text):
 def print_banner():
     """Print the Browse Code ASCII art banner."""
     console.print()
-    for b, c in zip(ASCII_BROWSE, ASCII_CODE):
-        console.print(f"[bold green]{b}[/bold green][bold red]{c}[/bold red]")
+    columns, _ = shutil.get_terminal_size()
+    if columns < 95:
+        # Terminal is narrow, print compact bracket logo
+        for l, r in zip(ASCII_COMPACT_LEFT, ASCII_COMPACT_RIGHT):
+            console.print(f"      [bold green]{l}[/bold green][bold red]{r}[/bold red]")
+    else:
+        # Full ASCII art
+        for b, c in zip(ASCII_BROWSE, ASCII_CODE):
+            console.print(f"[bold green]{b}[/bold green][bold red]{c}[/bold red]")
 
 
 def setup_extension():
