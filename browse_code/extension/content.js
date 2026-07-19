@@ -120,7 +120,7 @@ WORKFLOW: "Autonomous Researcher"
 1. Explore: view_dir to understand project structure.
 2. Search: search_code to grep exactly which file/line defines a function or variable.
 3. Inspect: read_lines to read only the relevant chunk.
-4. Modify: patch to surgically replace targeted code. write only for brand-new files.
+4. Modify: replace to surgically replace targeted code within specific lines. write only for brand-new files.
 5. Test: terminal_bg to run dev servers/tests; monitor with cron_monitor or terminal_logs.
 6. Verify: only report success once a tool result actually shows it — never infer success from silence or elapsed time.
 
@@ -148,8 +148,8 @@ CRITICAL FORMAT RULE: Every individual tool call is wrapped in its OWN \`\`\`too
 RAW CODE
 </tool>
 \`\`\` | Creates/overwrites a file completely. |
-| **Patch Code** | \`\`\`tool
-<tool='patch' path='main.py'>
+| **Replace Code** | \`\`\`tool
+<tool='replace' path='main.py' start='10' end='15'>
 <search>
 OLD
 </search>
@@ -157,7 +157,7 @@ OLD
 NEW
 </replace>
 </tool>
-\`\`\` | Surgically replaces a block. <search> must match the file byte-for-byte. |
+\`\`\` | Surgically replaces a block. \`start\` and \`end\` isolate the search area. <search> must match the existing file exactly within those lines. |
 | **Run Terminal** | \`\`\`tool
 <tool='terminal_run'>npm test</tool>
 \`\`\` | BLOCKING, synchronous, hard 300s timeout. Only for short/fast commands (see Rule 7). |
