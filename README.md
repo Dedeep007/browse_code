@@ -2,10 +2,10 @@
   <img src="logo.png" alt="Browse Code" width="200">
 </p>
 
-# Browse Code 🤖💻
+# Browse Code
 
 [![PyPI - Version](https://img.shields.io/pypi/v/browse-code?style=for-the-badge&color=blue)](https://pypi.org/project/browse-code/)
-[![PyPI Downloads](https://static.pepy.tech/personalized-badge/browse-code?period=total&units=INTERNATIONAL_SYSTEM&left_color=BLACK&right_color=GREEN&left_text=downloads)](https://pepy.tech/projects/browse-code)
+[![PyPI Downloads](https://img.shields.io/pepy/dt/browse-code?style=for-the-badge&color=green)](https://pepy.tech/projects/browse-code)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue?style=for-the-badge)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
 
@@ -19,16 +19,16 @@ Stop copy-pasting code back and forth! Browse Code bridges your browser and loca
 
 ---
 
-## ✨ Why Browse Code?
+## Why Browse Code?
 
-* 💸 **100% Free Autonomous Agents**: Leverage the free tiers of powerful models like Claude 3.5 Sonnet or Gemini 1.5 Pro to build entire projects autonomously without paying for expensive agent services.
-* 🔒 **Local & Secure**: Your code stays on your machine. The AI only reads what it searches for.
-* 🚀 **Seamless Integration**: Works out-of-the-box with ChatGPT, Claude, Gemini, and HuggingFace Chat.
-* 🛠️ **Advanced Tooling**: Features true regex codebase searching, precise line-based surgical edits, and asynchronous background process monitoring.
+* **100% Free Autonomous Agents**: Leverage the free tiers of powerful models like Claude 3.5 Sonnet or Gemini 1.5 Pro to build entire projects autonomously without paying for expensive agent services.
+* **Local & Secure**: Your code stays on your machine. The AI only reads what it searches for.
+* **Seamless Integration**: Works out-of-the-box with ChatGPT, Claude, Gemini, and HuggingFace Chat.
+* **Advanced Tooling**: Features true regex codebase searching, precise line-based surgical edits, and asynchronous background process monitoring.
 
 ---
 
-## 🤔 How is this different from Claude Code / Cursor / Devin?
+## How is this different from Claude Code / Cursor / Devin?
 
 Most autonomous coding tools (like Claude Code, Cursor, or Devin) are **API-based**. This means you must provide your own API keys, and you pay per token for every single file read, search, and edit. Over a long coding session, this can easily cost dollars per hour!
 
@@ -38,7 +38,7 @@ Most autonomous coding tools (like Claude Code, Cursor, or Devin) are **API-base
 
 ---
 
-## ⚙️ How It Works
+## How It Works
 
 Browse Code consists of two tightly integrated components:
 
@@ -47,7 +47,7 @@ Browse Code consists of two tightly integrated components:
 
 ---
 
-## 🚀 Quick Setup
+## Quick Setup
 
 ### Step 1: Install the Package
 ```bash
@@ -76,18 +76,18 @@ On your very first run, `bc` will guide you through a simple Chrome extension se
 
 ---
 
-## 🛠️ Core Capabilities
+## Core Capabilities
 
-* 📂 **Directory Exploration (`view_dir`)**: The AI can map out your project structure.
-* 🔍 **True Regex Search (`search_code`)**: Blazing fast codebase search using compiled Python regex.
-* 📖 **Surgical Reading (`read_lines`)**: Reads specific chunks of files to preserve LLM token context.
-* ✏️ **Precise Editing (`replace` / `write`)**: Surgically replaces specific code blocks using start/end line bounds to eliminate hallucination, complete with beautiful inline terminal diffs!
-* 💻 **Terminal Execution (`terminal_run`)**: Runs synchronous shell commands with full stdout/stderr capture (e.g., `git commit`, `ls`).
-* 🔄 **Background Processes (`terminal_bg`)**: Starts and monitors long-running dev servers or build scripts (e.g., `npm run dev`) asynchronously.
+* **Directory Exploration (`view_dir`)**: The AI can map out your project structure.
+* **True Regex Search (`search_code`)**: Blazing fast codebase search using compiled Python regex.
+* **Surgical Reading (`read_lines`)**: Reads specific chunks of files to preserve LLM token context.
+* **Precise Editing (`replace` / `write`)**: Surgically replaces specific code blocks using start/end line bounds to eliminate hallucination, complete with beautiful inline terminal diffs!
+* **Terminal Execution (`terminal_run`)**: Runs synchronous shell commands with full stdout/stderr capture (e.g., `git commit`, `ls`).
+* **Background Processes (`terminal_bg`)**: Starts and monitors long-running dev servers or build scripts (e.g., `npm run dev`) asynchronously.
 
 ---
 
-## 👨‍💻 For Developers
+## For Developers
 
 Want to contribute or hack on Browse Code?
 
@@ -105,5 +105,5 @@ Contributions are always welcome! Feel free to open a Pull Request.
 
 ---
 
-## 📄 License
+## License
 Distributed under the MIT License.
