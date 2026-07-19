@@ -28,6 +28,16 @@ Stop copy-pasting code back and forth! Browse Code bridges your browser and loca
 
 ---
 
+## 🤔 How is this different from Claude Code / Cursor / Devin?
+
+Most autonomous coding tools (like Claude Code, Cursor, or Devin) are **API-based**. This means you must provide your own API keys, and you pay per token for every single file read, search, and edit. Over a long coding session, this can easily cost dollars per hour!
+
+**Browse Code is entirely different.** It operates purely via a Chrome Extension that injects agentic workflows directly into the native web UI of ChatGPT, Gemini, or Claude. 
+
+**This means you don't need ANY API keys!** It hijacks your existing free or Plus subscription and turns the standard web chat into a fully integrated, local execution environment for free.
+
+---
+
 ## ⚙️ How It Works
 
 Browse Code consists of two tightly integrated components:
