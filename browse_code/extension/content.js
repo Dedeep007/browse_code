@@ -410,6 +410,32 @@ async function injectAndSend(promptText) {
     }
 }
 
+// --- NEW: Global Watchdog to ensure System Messages are sent ---
+setInterval(() => {
+    const inputBox = document.querySelector(PLATFORM.inputBox);
+    if (!inputBox) return;
+    const currentText = inputBox.tagName === 'INPUT' || inputBox.tagName === 'TEXTAREA' ? inputBox.value : inputBox.textContent;
+    
+    // Check if it's a system message
+    if (currentText && (currentText.includes('[System - Tool Execution') || currentText.includes('[System - Error') || currentText.includes('[System Reminder') || currentText.includes('[System - '))) {
+        
+        // Check if LLM is generating
+        if (PLATFORM.stopBtn && document.querySelector(PLATFORM.stopBtn)) {
+            return; // Still generating, wait
+        }
+        
+        const btn = document.querySelector(PLATFORM.sendBtn);
+        if (btn && !btn.disabled && btn.getAttribute('aria-disabled') !== 'true') {
+            console.log("Watchdog: Forcing send for stuck system message...");
+            btn.click();
+        } else {
+            // Force React/Angular to detect the input and enable the button
+            inputBox.dispatchEvent(new Event('input', { bubbles: true, composed: true }));
+            inputBox.dispatchEvent(new KeyboardEvent('keydown', { bubbles: true, cancelable: true, key: 'Enter', code: 'Enter' }));
+        }
+    }
+}, 1000);
+
 // --- NEW: Robust Text Stability Engine ---
 let isWaitingForLLM = false;
 let lastProcessedMessage = "";
