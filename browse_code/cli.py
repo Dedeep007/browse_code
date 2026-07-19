@@ -37,22 +37,25 @@ ASCII_CODE = [
     "╚═════╝ ╚═════╝ ╚═════╝ ╚══════╝"
 ]
 
-ASCII_COMPACT_LEFT = [
-    "   ████╗",
-    "  ██╔══╝",
-    " ████╗  ",
-    " ╚══██╗ ",
-    "  ██╔══╝",
-    "  ╚████╗"
-]
-
-ASCII_COMPACT_RIGHT = [
-    "████╗   ",
-    "╚══██╗  ",
-    "  ████╗ ",
-    " ██╔══╝ ",
-    "╚══██╗  ",
-    "████╔╝  "
+ASCII_COMPACT = [
+    "██████████████████████████████",
+    "██████████████████████████████",
+    "███████████[bold green]▒▒▒▒[/bold green][bold red]▓[/bold red]█[bold red]▓▒▒▒▒[/bold red]████████",
+    "██████████[bold green]▒▒▒▒▒[/bold green][bold red]▓[/bold red]█[bold red]▓▒▒▒▒▒[/bold red]███████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▒▒▒▓[/bold red]██████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▒▒▒▓[/bold red]██████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▓▒▒▓[/bold red]██████",
+    "█████████[bold green]▒▒▒▓[/bold green]███████[bold red]▓▒▒▒[/bold red]██████",
+    "███████[bold green]▒▒▒▒▓[/bold green]█████████[bold red]▓▒▒▒▒[/bold red]████",
+    "███████[bold green]▒▒▒▒▓[/bold green]█████████[bold red]▓▒▒▒▒[/bold red]████",
+    "█████████[bold green]▒▒▒▓[/bold green]███████[bold red]▓▒▒▒[/bold red]██████",
+    "█████████[bold green]▓▒▒▓[/bold green]███████[bold red]▓▒▒▓[/bold red]██████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▒▒▒▓[/bold red]██████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▒▒▒▓[/bold red]██████",
+    "█████████[bold green]▓▒▒▒[/bold green]███████[bold red]▒▒▒▓[/bold red]██████",
+    "██████████[bold green]▒▒▒▒▒[/bold green][bold red]▓[/bold red]█[bold red]▓▒▒▒▒▒[/bold red]███████",
+    "███████████[bold green]▓▒▒▒[/bold green][bold red]▓[/bold red]█[bold red]▓▒▒▓[/bold red]████████",
+    "██████████████████████████████"
 ]
 
 def get_data_dir():
@@ -94,8 +97,8 @@ def print_banner():
     columns, _ = shutil.get_terminal_size()
     if columns < 95:
         # Terminal is narrow, print compact bracket logo
-        for l, r in zip(ASCII_COMPACT_LEFT, ASCII_COMPACT_RIGHT):
-            console.print(f"      [bold green]{l}[/bold green][bold red]{r}[/bold red]")
+        for line in ASCII_COMPACT:
+            console.print(f"      {line}")
     else:
         # Full ASCII art
         for b, c in zip(ASCII_BROWSE, ASCII_CODE):
