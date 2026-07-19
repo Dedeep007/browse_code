@@ -501,6 +501,10 @@ setInterval(() => {
     const lastContainer = containers[containers.length - 1];
     if (lastContainer.hasAttribute('data-agent-processed')) return;
 
+    const currentLength = lastContainer.innerHTML.length;
+    if (lastContainer.dataset.lastLength == currentLength) return;
+    lastContainer.dataset.lastLength = currentLength;
+
     // Grab the very last message in the chat using getDeepText to pierce Shadow DOM (Gemini code blocks)
     const currentText = getDeepText(lastContainer);
 
@@ -512,8 +516,8 @@ setInterval(() => {
 }, 1000);
 
 function trackResponse(initialText) {
-    let previousText = initialText;
     let unchangedTicks = 0;
+    let previousLength = 0;
 
     if (trackInterval) clearInterval(trackInterval);
 
@@ -524,13 +528,14 @@ function trackResponse(initialText) {
         const lastContainer = containers.length > 0 ? containers[containers.length - 1] : null;
         if (!lastContainer) return;
 
-        const currentText = getDeepText(lastContainer);
-
         // Check if the LLM is still typing
         const isGenerating = PLATFORM.stopBtn && document.querySelector(PLATFORM.stopBtn);
         
-        if (currentText.length > previousText.length) {
-            previousText = currentText;
+        // Lightweight check for changes instead of recursive getDeepText
+        const currentLength = lastContainer.innerHTML.length;
+        
+        if (currentLength > previousLength) {
+            previousLength = currentLength;
             unchangedTicks = 0;
         } else {
             unchangedTicks++;
@@ -541,6 +546,9 @@ function trackResponse(initialText) {
             clearInterval(trackInterval);
             lastContainer.setAttribute('data-agent-processed', 'true');
             isWaitingForLLM = false; // UNLOCK IMMEDIATELY to prevent deadlocks from long-running tools
+            
+            // Heavy DOM parsing happens ONLY ONCE when generation completes!
+            const currentText = getDeepText(lastContainer);
             
             const toolMatches = currentText.match(/<tool=[\s\S]*?<\/tool>/g);
             if (toolMatches && toolMatches.length > 0) {
