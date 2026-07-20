@@ -1,7 +1,7 @@
 <p align="center">
   <img src="logo.svg" alt="Browse Code" width="200">
 </p>
-
+ 
 # Browse Code
 
 [![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.65-blue?style=for-the-badge)](https://pypi.org/project/browse-code/)
