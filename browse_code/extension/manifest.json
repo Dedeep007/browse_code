@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Browse Code Bridge",
-  "version": "2.3",
+  "version": "2.4",
   "description": "Autonomous AI Code Execution Bridge",
   "icons": {
     "16": "icon16.png",
