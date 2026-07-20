@@ -4,106 +4,167 @@
 <head>
   <style>
     body {
-      font-family: 'Segoe UI', sans-serif;
-      width: 350px;
-      padding: 15px;
+      font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, sans-serif;
+      width: 360px;
+      padding: 16px;
       margin: 0;
-      background-color: #0f172a;
-      color: #f8fafc;
+      background-color: #0d1117; /* GitHub dark mode background */
+      color: #c9d1d9;
     }
 
     h3 {
       margin-top: 0;
-      font-size: 16px;
-      border-bottom: 1px solid #334155;
-      padding-bottom: 5px;
+      font-size: 18px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid #30363d;
+      background: linear-gradient(90deg, #2ea043, #da3633);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      font-weight: 700;
+      letter-spacing: 0.5px;
     }
 
     label {
       font-size: 12px;
-      font-weight: bold;
-      color: #94a3b8;
+      font-weight: 600;
+      color: #8b949e;
+      display: block;
+      margin-top: 12px;
+      margin-bottom: 4px;
     }
 
     input {
       width: 100%;
       box-sizing: border-box;
-      padding: 8px;
-      margin: 8px 0;
-      background: #1e293b;
-      border: 1px solid #475569;
-      color: white;
-      border-radius: 4px;
+      padding: 10px;
+      margin: 0 0 8px 0;
+      background: #161b22;
+      border: 1px solid #30363d;
+      color: #c9d1d9;
+      border-radius: 6px;
+      font-family: inherit;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    input:focus {
+      outline: none;
+      border-color: #2ea043;
+      box-shadow: 0 0 0 3px rgba(46, 160, 67, 0.2);
     }
 
     button {
       width: 100%;
       padding: 10px;
-      font-weight: bold;
-      border: none;
-      border-radius: 5px;
+      font-weight: 600;
+      font-size: 13px;
+      border: 1px solid transparent;
+      border-radius: 6px;
       cursor: pointer;
-      transition: 0.2s;
+      transition: all 0.2s ease;
+      font-family: inherit;
     }
 
     #save-btn {
-      background-color: #3b82f6;
-      color: white;
-      margin-bottom: 15px;
+      background-color: #21262d;
+      color: #c9d1d9;
+      border-color: #30363d;
+      margin-bottom: 16px;
+      margin-top: 4px;
+    }
+
+    #save-btn:hover {
+      background-color: #30363d;
+      border-color: #8b949e;
+    }
+
+    .action-row {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
     }
 
     #init-btn {
-      background-color: #10b981;
+      background-color: #2ea043;
       color: white;
-      margin-bottom: 15px;
+      flex: 1;
+    }
+
+    #init-btn:hover {
+      background-color: #2c974b;
+      box-shadow: 0 4px 12px rgba(46, 160, 67, 0.2);
+    }
+
+    #resume-btn {
+      background-color: #da3633;
+      color: white;
+      flex: 1;
+    }
+
+    #resume-btn:hover {
+      background-color: #b32d2a;
+      box-shadow: 0 4px 12px rgba(218, 54, 51, 0.2);
     }
 
     .dashboard {
-      background: #1e293b;
-      padding: 10px;
-      border-radius: 5px;
+      background: #161b22;
+      padding: 12px;
+      border-radius: 6px;
+      border: 1px solid #30363d;
       font-size: 12px;
+      min-height: 40px;
     }
 
     .process-card {
-      background: #000;
-      border: 1px solid #334155;
-      padding: 8px;
+      background: #0d1117;
+      border: 1px solid #30363d;
+      padding: 10px;
       margin-top: 8px;
-      border-radius: 4px;
+      border-radius: 6px;
+    }
+    
+    .process-card:first-child {
+      margin-top: 0;
     }
 
     .pid {
-      color: #f59e0b;
-      font-weight: bold;
+      color: #d2a8ff;
+      font-weight: 700;
     }
 
     .log-preview {
-      font-family: monospace;
-      color: #a3e635;
-      font-size: 10px;
+      font-family: 'Courier New', Courier, monospace;
+      color: #7ee787;
+      font-size: 11px;
       white-space: pre-wrap;
       overflow-x: hidden;
-      margin-top: 5px;
+      margin-top: 8px;
+      background: #010409;
+      padding: 6px;
+      border-radius: 4px;
+      border: 1px solid #30363d;
     }
   </style>
 </head>
 
 <body>
-  <h3>Agent Dashboard</h3>
-  <label>Workspace Directory:</label>
+  <h3>Browse Code Agent</h3>
+  
+  <label>Workspace Directory</label>
   <input type="text" id="dir-input" placeholder="C:\Projects\app">
-  <label>Inject Prompt Every N Messages (0 to disable):</label>
+  
+  <label>Inject Prompt Every N Messages (0 to disable)</label>
   <input type="number" id="inject-n-input" placeholder="10" value="10" min="0">
+  
   <button id="save-btn">Save Settings</button>
-  <div style="display: flex; gap: 10px; margin-top: 5px;">
-    <button id="init-btn" style="flex: 1;">Start Agent Session</button>
-    <button id="resume-btn" style="flex: 1; background: #3b82f6;">Resume Session</button>
+  
+  <div class="action-row">
+    <button id="init-btn">Start Session</button>
+    <button id="resume-btn">Resume Session</button>
   </div>
 
   <h3>Live Terminals</h3>
   <div class="dashboard" id="process-list">
-    <div style="color: #94a3b8;">No active background processes...</div>
+    <div style="color: #8b949e; text-align: center; padding: 10px 0;">No active background processes</div>
   </div>
 
   <script src="popup.js"></script>
