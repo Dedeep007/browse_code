@@ -4,10 +4,10 @@
  
 # Browse Code
 
-[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.65-blue?style=for-the-badge)](https://pypi.org/project/browse-code/)
+[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.65-blue)](https://pypi.org/project/browse-code/)
 [![Downloads](https://static.pepy.tech/badge/browse-code)](https://pepy.tech/project/browse-code)
-[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue?style=for-the-badge)](https://www.python.org/downloads/)
-[![License](https://img.shields.io/badge/license-MIT-green?style=for-the-badge)](https://opensource.org/licenses/MIT)
+[![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
+[![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
 
 **Browse Code** is a powerful CLI tool and browser extension that turns any web-based AI chatbot (ChatGPT, Gemini, Claude, HuggingFace) into a fully **autonomous coding agent** (similar to Devin or Antigravity) running right on your local machine.
 
