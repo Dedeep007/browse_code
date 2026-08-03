@@ -4,7 +4,7 @@
  
 # Browse Code
 
-[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.65-blue)](https://pypi.org/project/browse-code/)
+[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.66-blue)](https://pypi.org/project/browse-code/)
 [![Downloads](https://static.pepy.tech/badge/browse-code)](https://pepy.tech/project/browse-code)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
@@ -63,10 +63,18 @@ bc
 
 ### Step 3: First-Run Extension Setup (One-Time)
 On your very first run, `bc` will guide you through a simple Chrome extension setup:
+**For Chrome / Edge / Brave / Chromium:**
 1. It automatically extracts the extension to `~/.browse_code/extension/` and copies the path to your clipboard.
 2. It opens `chrome://extensions/` in your browser.
 3. Enable **Developer mode** (top-right), click **Load unpacked**, and paste the path.
-4. Press Enter in your terminal. You're done forever!
+
+**For Firefox / LibreWolf / Waterfox:**
+1. Open `about:debugging` in your URL bar.
+2. Click **This Firefox** on the left menu.
+3. Click **Load Temporary Add-on...**
+4. Navigate to `~/.browse_code/extension/` and select the `manifest.json` file.
+
+Press Enter in your terminal. You're done!
 
 ### Step 4: Start Coding Autonomously
 1. Open any supported AI chat (ChatGPT, Gemini, Claude, or HuggingFace Chat).
