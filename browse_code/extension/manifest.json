@@ -6,7 +6,7 @@
   "browser_specific_settings": {
     "gecko": {
       "id": "browse-code@dedeep007.github.io",
-      "strict_min_version": "109.0"
+      "strict_min_version": "121.0"
     }
   },
   "icons": {
@@ -22,6 +22,9 @@
     "http://127.0.0.1/*",
     "http://localhost/*"
   ],
+  "background": {
+    "service_worker": "background.js"
+  },
   "content_scripts": [
     {
       "matches": [

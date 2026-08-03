@@ -1,3 +1,36 @@
+// Smart local fetch: Chrome content scripts bypass page CSP, but Firefox MV3
+// content scripts are subject to the page's CSP (which blocks localhost).
+// We try direct fetch first; if CSP blocks it, switch to background proxy permanently.
+let _useProxy = false;
+
+async function localFetch(url, options = {}) {
+    if (!_useProxy) {
+        try {
+            return await fetch(url, options);
+        } catch (e) {
+            console.log("[Browse Code] Direct fetch blocked (CSP), switching to background proxy");
+            _useProxy = true;
+        }
+    }
+    // Background proxy path (Firefox)
+    return new Promise((resolve, reject) => {
+        chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
+            if (chrome.runtime.lastError) {
+                return reject(new Error(chrome.runtime.lastError.message));
+            }
+            if (!response || response.error) {
+                return reject(new Error(response?.error || "No response from background"));
+            }
+            resolve({
+                ok: response.ok,
+                status: response.status,
+                json: async () => response.data,
+                text: async () => response.text
+            });
+        });
+    });
+}
+
 const LOCAL_SERVER = "http://127.0.0.1:5505";
 const hostname = window.location.hostname;
 
@@ -58,7 +91,7 @@ function pingServer() {
     const headers = {};
     if (sessionToken) headers['X-Session-Token'] = sessionToken;
     
-    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
+    localFetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
         .then(res => res.json())
         .then(data => {
             if (data.key && data.key !== serverKey) {
@@ -269,7 +302,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.warn("No Server Key configured. Please add it in the extension popup.");
             return;
         }
-        fetch(`${LOCAL_SERVER}/extension/init`, { 
+        localFetch(`${LOCAL_SERVER}/extension/init`, { 
             method: 'POST',
             headers: { 'X-Server-Key': serverKey }
         })
@@ -303,7 +336,7 @@ window.addEventListener('message', (event) => {
         }
     } else if (event.data && event.data.type === 'AGENT_BRIDGE_FORWARD_IMAGE') {
         if (!sessionToken || !serverKey) return;
-        fetch(`${LOCAL_SERVER}/extension/save-image`, {
+        localFetch(`${LOCAL_SERVER}/extension/save-image`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -555,7 +588,7 @@ function trackResponse(initialText) {
             if (toolMatches && toolMatches.length > 0) {
                 try {
                     const toolPromises = toolMatches.map(async (toolCall) => {
-                        const response = await fetch(`${LOCAL_SERVER}/extension/run-tool`, {
+                        const response = await localFetch(`${LOCAL_SERVER}/extension/run-tool`, {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -626,7 +659,7 @@ setInterval(() => {
                         window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
                     } else {
                         if (!sessionToken || !serverKey) return;
-                        fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                        localFetch(`${LOCAL_SERVER}/extension/save-image`, {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -697,7 +730,7 @@ setInterval(() => {
                 window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
             } else {
                 if (!sessionToken || !serverKey) return;
-                fetch(`${LOCAL_SERVER}/extension/save-image`, {
+                localFetch(`${LOCAL_SERVER}/extension/save-image`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
