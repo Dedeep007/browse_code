@@ -17,7 +17,7 @@ from rich import box
 console = Console()
 
 PORT = 5505
-HOST = "localhost"
+HOST = "127.0.0.1"
 
 ASCII_BROWSE = [
     "██████╗ ██████╗  ██████╗ ██╗    ██╗███████╗███████╗    ",

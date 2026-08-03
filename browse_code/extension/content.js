@@ -1,45 +1,4 @@
-// Proxy local fetches through background script to bypass CSP in Firefox
-async function proxyFetch(url, options = {}) {
-    if (typeof url === 'string' && url.startsWith('http://localhost')) {
-        return new Promise((resolve, reject) => {
-            try {
-                chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
-                    if (chrome.runtime.lastError) {
-                        const msg = chrome.runtime.lastError.message || "";
-                        if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
-                            console.warn("[Browse Code] Background proxy unavailable, falling back to native fetch");
-                            resolve(fetch(url, options));
-                            return;
-                        }
-                        console.error("[Browse Code Error] sendMessage failed:", msg);
-                        return reject(new Error(msg));
-                    }
-                    if (!response) {
-                        console.warn("[Browse Code Error] No response from background script. Falling back to native fetch.");
-                        resolve(fetch(url, options));
-                        return;
-                    }
-                    if (response.error) {
-                        console.error("[Browse Code Error] Background fetch failed for", url, ":", response.error);
-                        return reject(new Error(response.error));
-                    }
-                    resolve({
-                        ok: response.ok,
-                        status: response.status,
-                        json: async () => response.data,
-                        text: async () => response.text
-                    });
-                });
-            } catch (e) {
-                console.warn("[Browse Code] sendMessage exception, falling back to native fetch:", e);
-                resolve(fetch(url, options));
-            }
-        });
-    }
-    return fetch(url, options);
-}
-
-const LOCAL_SERVER = "http://localhost:5505";
+const LOCAL_SERVER = "http://127.0.0.1:5505";
 const hostname = window.location.hostname;
 
 let PLATFORM = {};
@@ -99,7 +58,7 @@ function pingServer() {
     const headers = {};
     if (sessionToken) headers['X-Session-Token'] = sessionToken;
     
-    proxyFetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
+    fetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
         .then(res => res.json())
         .then(data => {
             if (data.key && data.key !== serverKey) {
@@ -310,7 +269,7 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
             console.warn("No Server Key configured. Please add it in the extension popup.");
             return;
         }
-        proxyFetch(`${LOCAL_SERVER}/extension/init`, { 
+        fetch(`${LOCAL_SERVER}/extension/init`, { 
             method: 'POST',
             headers: { 'X-Server-Key': serverKey }
         })
@@ -344,7 +303,7 @@ window.addEventListener('message', (event) => {
         }
     } else if (event.data && event.data.type === 'AGENT_BRIDGE_FORWARD_IMAGE') {
         if (!sessionToken || !serverKey) return;
-        proxyFetch(`${LOCAL_SERVER}/extension/save-image`, {
+        fetch(`${LOCAL_SERVER}/extension/save-image`, {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -596,7 +555,7 @@ function trackResponse(initialText) {
             if (toolMatches && toolMatches.length > 0) {
                 try {
                     const toolPromises = toolMatches.map(async (toolCall) => {
-                        const response = await proxyFetch(`${LOCAL_SERVER}/extension/run-tool`, {
+                        const response = await fetch(`${LOCAL_SERVER}/extension/run-tool`, {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -667,7 +626,7 @@ setInterval(() => {
                         window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
                     } else {
                         if (!sessionToken || !serverKey) return;
-                        proxyFetch(`${LOCAL_SERVER}/extension/save-image`, {
+                        fetch(`${LOCAL_SERVER}/extension/save-image`, {
                             method: 'POST',
                             headers: { 
                                 'Content-Type': 'application/json',
@@ -738,7 +697,7 @@ setInterval(() => {
                 window.parent.postMessage({ type: 'AGENT_BRIDGE_FORWARD_IMAGE', base64: base64 }, '*');
             } else {
                 if (!sessionToken || !serverKey) return;
-                proxyFetch(`${LOCAL_SERVER}/extension/save-image`, {
+                fetch(`${LOCAL_SERVER}/extension/save-image`, {
                     method: 'POST',
                     headers: { 
                         'Content-Type': 'application/json',
