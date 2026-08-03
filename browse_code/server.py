@@ -34,14 +34,20 @@ async def check_extension_connection():
                         "The server is running, but the browser extension hasn't connected.\n"
                         "To fix this:\n"
                         "  1. Ensure the [bold]Browse Code[/bold] extension is installed and enabled.\n"
-                        "  2. Make sure Chrome is open and your AI chat tab is active.\n"
+                        "  2. Make sure Chrome/Edge/Firefox is open and your AI chat tab is active.\n"
                         "  3. Try reloading the AI browser tab.\n"
-                        "  4. If that fails, try reloading the extension in chrome://extensions/.\n\n"
-                        "[dim]If you haven't installed it yet:[/dim]\n"
-                        "  • Open [cyan]chrome://extensions/[/cyan]\n"
-                        "  • Enable [bold]Developer Mode[/bold] (top right)\n"
-                        "  • Click [bold]Load unpacked[/bold] and select this folder:\n"
-                        f"    [green]{ext_path}[/green]",
+                        "  4. If that fails, try reloading the extension.\n\n"
+                        "[dim]If you haven't installed it yet:[/dim]\n\n"
+                        "  [cyan]For Chrome / Edge:[/cyan]\n"
+                        "    • Open chrome://extensions/ (or edge://extensions/)\n"
+                        "    • Enable Developer Mode (top right)\n"
+                        "    • Click Load unpacked and select this folder:\n"
+                        f"      [green]{ext_path}[/green]\n\n"
+                        "  [cyan]For Firefox:[/cyan]\n"
+                        "    • Open about:debugging\n"
+                        "    • Click 'This Firefox' on the left menu\n"
+                        "    • Click 'Load Temporary Add-on' and select the manifest.json inside this folder:\n"
+                        f"      [green]{ext_path}[/green]",
                         title="[bold yellow]Warning[/bold yellow]",
                         title_align="left",
                         border_style="yellow",

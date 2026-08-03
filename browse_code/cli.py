@@ -108,8 +108,8 @@ def setup_extension():
     # Copy path to clipboard
     copied = copy_to_clipboard(ext_path_str)
 
-    # Open chrome://extensions
-    console.print("  [green]Opening Chrome extensions page...[/green]")
+    # Open chrome://extensions (for Chromium browsers)
+    console.print("  [green]Opening extensions page (for Chrome/Edge)...[/green]")
     webbrowser.open("chrome://extensions/")
 
     # Setup instructions
@@ -122,13 +122,17 @@ def setup_extension():
     steps.add_column("step", style="bold green", width=4)
     steps.add_column("instruction")
 
+    steps.add_row("", "[cyan][bold]For Chrome / Edge:[/bold][/cyan]")
     steps.add_row("1.", "Enable [bold]Developer mode[/bold] in the top right")
     steps.add_row(
         "2.",
-        f"Click [bold]Load unpacked[/bold] and select this folder:\n[cyan]{ext_path_str}[/cyan]"
-        + (" [dim](Copied to clipboard!)[/dim]" if copied else ""),
+        f"Click [bold]Load unpacked[/bold] and select:\n[cyan]{ext_path_str}[/cyan]"
+        + (" [dim](Copied!)[/dim]" if copied else ""),
     )
-    steps.add_row("3.", "The Browse Code icon should now appear in your browser")
+    steps.add_row("", "")
+    steps.add_row("", "[cyan][bold]For Firefox:[/bold][/cyan]")
+    steps.add_row("1.", "Open [bold]about:debugging[/bold] and click [bold]This Firefox[/bold]")
+    steps.add_row("2.", f"Click [bold]Load Temporary Add-on[/bold] and select [bold]manifest.json[/bold] inside:\n[cyan]{ext_path_str}[/cyan]")
 
     console.print(
         Panel(
