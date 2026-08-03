@@ -1,6 +1,6 @@
 // Proxy local fetches through background script to bypass CSP in Firefox
 async function proxyFetch(url, options = {}) {
-    if (typeof url === 'string' && url.startsWith('http://127.0.0.1')) {
+    if (typeof url === 'string' && url.startsWith('http://localhost')) {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
                 if (chrome.runtime.lastError) {
@@ -27,7 +27,7 @@ async function proxyFetch(url, options = {}) {
     return fetch(url, options);
 }
 
-const LOCAL_SERVER = "http://127.0.0.1:5505";
+const LOCAL_SERVER = "http://localhost:5505";
 const hostname = window.location.hostname;
 
 let PLATFORM = {};

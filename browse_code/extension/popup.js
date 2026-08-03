@@ -74,7 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function syncWithServer(path, key) {
         if (!path || !key) return;
-        fetch('http://127.0.0.1:5505/set-workspace', {
+        fetch('http://localhost:5505/set-workspace', {
             method: 'POST',
             headers: { 
                 'Content-Type': 'application/json',
@@ -87,7 +87,7 @@ document.addEventListener('DOMContentLoaded', () => {
     function pollStatus() {
         chrome.storage.local.get(['serverKey'], (result) => {
             if (!result.serverKey) return;
-            fetch('http://127.0.0.1:5505/status', {
+            fetch('http://localhost:5505/status', {
                 headers: { 'X-Server-Key': result.serverKey }
             })
                 .then(res => res.json())
