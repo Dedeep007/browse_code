@@ -71,7 +71,7 @@ app = FastAPI(title="Agent Bridge", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origin_regex=r"https://.*\.claudemcpcontent\.com|https://claude\.ai|https://gemini\.google\.com|https://chatgpt\.com|https://chat\.openai\.com|https://huggingface\.co|chrome-extension://.*|http://localhost:.*|http://127\.0\.0\.1:.*",
+    allow_origin_regex=r"https://.*\.claudemcpcontent\.com|https://claude\.ai|https://gemini\.google\.com|https://chatgpt\.com|https://chat\.openai\.com|https://huggingface\.co|chrome-extension://.*|moz-extension://.*|http://localhost:.*|http://127\.0\.0\.1:.*",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
