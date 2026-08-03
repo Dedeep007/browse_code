@@ -2,26 +2,38 @@
 async function proxyFetch(url, options = {}) {
     if (typeof url === 'string' && url.startsWith('http://localhost')) {
         return new Promise((resolve, reject) => {
-            chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
-                if (chrome.runtime.lastError) {
-                    console.error("[Browse Code Error] sendMessage failed:", chrome.runtime.lastError.message);
-                    return reject(new Error(chrome.runtime.lastError.message));
-                }
-                if (!response) {
-                    console.error("[Browse Code Error] No response from background script. Is the extension enabled?");
-                    return reject(new Error("No response from background script"));
-                }
-                if (response.error) {
-                    console.error("[Browse Code Error] Background fetch failed for", url, ":", response.error);
-                    return reject(new Error(response.error));
-                }
-                resolve({
-                    ok: response.ok,
-                    status: response.status,
-                    json: async () => response.data,
-                    text: async () => response.text
+            try {
+                chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
+                    if (chrome.runtime.lastError) {
+                        const msg = chrome.runtime.lastError.message || "";
+                        if (msg.includes("Receiving end does not exist") || msg.includes("Could not establish connection")) {
+                            console.warn("[Browse Code] Background proxy unavailable, falling back to native fetch");
+                            resolve(fetch(url, options));
+                            return;
+                        }
+                        console.error("[Browse Code Error] sendMessage failed:", msg);
+                        return reject(new Error(msg));
+                    }
+                    if (!response) {
+                        console.warn("[Browse Code Error] No response from background script. Falling back to native fetch.");
+                        resolve(fetch(url, options));
+                        return;
+                    }
+                    if (response.error) {
+                        console.error("[Browse Code Error] Background fetch failed for", url, ":", response.error);
+                        return reject(new Error(response.error));
+                    }
+                    resolve({
+                        ok: response.ok,
+                        status: response.status,
+                        json: async () => response.data,
+                        text: async () => response.text
+                    });
                 });
-            });
+            } catch (e) {
+                console.warn("[Browse Code] sendMessage exception, falling back to native fetch:", e);
+                resolve(fetch(url, options));
+            }
         });
     }
     return fetch(url, options);
