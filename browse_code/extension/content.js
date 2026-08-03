@@ -4,12 +4,15 @@ async function proxyFetch(url, options = {}) {
         return new Promise((resolve, reject) => {
             chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
                 if (chrome.runtime.lastError) {
+                    console.error("[Browse Code Error] sendMessage failed:", chrome.runtime.lastError.message);
                     return reject(new Error(chrome.runtime.lastError.message));
                 }
                 if (!response) {
+                    console.error("[Browse Code Error] No response from background script. Is the extension enabled?");
                     return reject(new Error("No response from background script"));
                 }
                 if (response.error) {
+                    console.error("[Browse Code Error] Background fetch failed for", url, ":", response.error);
                     return reject(new Error(response.error));
                 }
                 resolve({

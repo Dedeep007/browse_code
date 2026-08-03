@@ -4,7 +4,7 @@
  
 # Browse Code
 
-[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.69-blue)](https://pypi.org/project/browse-code/)
+[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.70-blue)](https://pypi.org/project/browse-code/)
 [![Downloads](https://static.pepy.tech/badge/browse-code)](https://pepy.tech/project/browse-code)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
