@@ -86,12 +86,6 @@ function pingServer() {
     
     localFetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
         .then(res => res.json())
-        .then(data => {
-            if (data.key && data.key !== serverKey) {
-                serverKey = data.key;
-                chrome.storage.local.set({ serverKey: serverKey });
-            }
-        })
         .catch(() => {});
 }
 pingServer();

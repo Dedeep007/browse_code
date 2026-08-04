@@ -40,7 +40,7 @@ chrome.storage.onChanged.addListener((changes, namespace) => {
     }
 });
 
-if (hostname.includes('gemini.google.com')) {
+if (hostname === 'gemini.google.com' || hostname.endsWith('.gemini.google.com')) {
     PLATFORM = {
         name: "Gemini",
         inputBox: 'rich-textarea div[contenteditable="true"], div[role="textbox"][contenteditable="true"], .ql-editor, textarea, input',
@@ -48,7 +48,7 @@ if (hostname.includes('gemini.google.com')) {
         stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"], button[mattooltip="Stop generating"], button[mattooltip="Stop"]',
         responseContainer: 'message-content, model-response, .model-response-text'
     };
-} else if (hostname.includes('claude.ai')) {
+} else if (hostname === 'claude.ai' || hostname.endsWith('.claude.ai')) {
     PLATFORM = {
         name: "Claude",
         inputBox: '.ProseMirror[contenteditable="true"]',
@@ -56,7 +56,7 @@ if (hostname.includes('gemini.google.com')) {
         stopBtn: 'button[aria-label="Stop generating"], button[aria-label="Stop"]',
         responseContainer: '.font-claude-response, .font-claude-message'
     };
-} else if (hostname.includes('huggingface.co')) {
+} else if (hostname === 'huggingface.co' || hostname.endsWith('.huggingface.co')) {
     PLATFORM = {
         name: "HuggingFace",
         inputBox: 'input[name="prompt"], textarea[name="prompt"]',
@@ -86,12 +86,6 @@ function pingServer() {
     
     localFetch(`${LOCAL_SERVER}/extension/ping?v=0.2.4`, { headers })
         .then(res => res.json())
-        .then(data => {
-            if (data.key && data.key !== serverKey) {
-                serverKey = data.key;
-                chrome.storage.local.set({ serverKey: serverKey });
-            }
-        })
         .catch(() => {});
 }
 pingServer();

@@ -36,8 +36,9 @@ async def check_extension_connection():
                         "To fix this:\n"
                         "  1. Ensure the [bold]Browse Code[/bold] extension is installed and enabled.\n"
                         "  2. Make sure Chrome/Edge/Firefox is open and your AI chat tab is active.\n"
-                        "  3. Try reloading the AI browser tab.\n"
-                        "  4. If that fails, try reloading the extension.\n\n"
+                        "  3. Open the extension popup (click the puzzle piece icon) and paste your Auth Key.\n"
+                        "  4. Try reloading the AI browser tab.\n"
+                        "  5. If that fails, try reloading the extension.\n\n"
                         "[dim]If you haven't installed it yet:[/dim]\n\n"
                         "  [cyan]For Chrome / Edge:[/cyan]\n"
                         "    • Open chrome://extensions/ (or edge://extensions/)\n"
@@ -221,7 +222,7 @@ def verify_session(x_session_token: str = Header(None)):
     if not x_session_token:
         raise HTTPException(status_code=401, detail="No active agent session initialized.")
     if x_session_token not in ACTIVE_SESSION_TOKENS:
-        ACTIVE_SESSION_TOKENS.add(x_session_token)
+        raise HTTPException(status_code=401, detail="Invalid session token.")
 
 @app.post("/extension/init")
 async def init_session(x_server_key: str = Header(None)):
@@ -246,7 +247,7 @@ async def extension_ping(v: str = None, x_session_token: str = Header(None)):
         if not was_connected:
             print(f"\n{C_OK}[+] Extension connected{C_RESET}")
             
-    return {"status": "ok", "key": SERVER_AUTH_KEY}
+    return {"status": "ok"}
 
 class ImageModel(BaseModel):
     base64: str

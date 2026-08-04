@@ -4,7 +4,7 @@
  
 # Browse Code
 
-[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.80-blue)](https://pypi.org/project/browse-code/)
+[![PyPI - Version](https://img.shields.io/badge/pypi-v0.2.81-blue)](https://pypi.org/project/browse-code/)
 [![Downloads](https://static.pepy.tech/badge/browse-code)](https://pepy.tech/project/browse-code)
 [![Python Version](https://img.shields.io/badge/python-3.8%2B-blue)](https://www.python.org/downloads/)
 [![License](https://img.shields.io/badge/license-MIT-green)](https://opensource.org/licenses/MIT)
@@ -78,9 +78,11 @@ Press Enter in your terminal. You're done!
 
 ### Step 4: Start Coding Autonomously
 1. Open any supported AI chat (ChatGPT, Gemini, Claude, or HuggingFace Chat).
-2. Click the **Browse Code Bridge** extension icon in your browser toolbar and set your workspace directory.
-3. Click **Initialize Agent in Chat**.
-4. Give the AI a task (e.g., *"Build a React Native app that syncs gallery photos"*) and watch it work entirely on its own!
+2. Click the **Browse Code Bridge** extension icon (the puzzle piece) in your browser toolbar.
+3. Paste the **Authentication Key** shown in your `bc` terminal into the extension popup.
+4. Set your desired workspace directory in the popup.
+5. Click **Initialize Agent in Chat**.
+6. Give the AI a task (e.g., *"Build a React Native app that syncs gallery photos"*) and watch it work entirely on its own!
 
 ---
 
