@@ -190,13 +190,33 @@ def main():
     data_dir = get_data_dir()
     marker = data_dir / ".installed"
 
-    # Always sync the latest extension files from the package to the data dir
-    # so updates (like new icons, JS changes) propagate automatically
-    ext_dest = data_dir / "extension"
+    # Create browser-specific extension folders to resolve MV3 manifest conflicts:
+    # Chrome MV3 rejects 'scripts', Firefox MV3 disables 'service_worker'
+    ext_chrome = data_dir / "extension_chrome"
+    ext_firefox = data_dir / "extension_firefox"
     pkg_ext_dir = Path(__file__).parent / "extension"
     try:
         import shutil
-        shutil.copytree(pkg_ext_dir, ext_dest, dirs_exist_ok=True)
+        import json
+        
+        # Chrome extension
+        shutil.copytree(pkg_ext_dir, ext_chrome, dirs_exist_ok=True)
+        # Firefox extension
+        shutil.copytree(pkg_ext_dir, ext_firefox, dirs_exist_ok=True)
+        
+        # Patch Firefox manifest
+        ff_manifest_path = ext_firefox / "manifest.json"
+        with open(ff_manifest_path, "r", encoding="utf-8") as f:
+            ff_manifest = json.load(f)
+        
+        # Replace service_worker with scripts for Firefox
+        if "background" in ff_manifest and "service_worker" in ff_manifest["background"]:
+            ff_manifest["background"]["scripts"] = [ff_manifest["background"]["service_worker"]]
+            del ff_manifest["background"]["service_worker"]
+            
+        with open(ff_manifest_path, "w", encoding="utf-8") as f:
+            json.dump(ff_manifest, f, indent=2)
+            
     except Exception:
         pass
 
