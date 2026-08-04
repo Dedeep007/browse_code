@@ -1,0 +1,54 @@
+{
+  "manifest_version": 3,
+  "name": "Browse Code Bridge",
+  "version": "2.5",
+  "description": "Autonomous AI Code Execution Bridge",
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "browse-code@dedeep007.github.io",
+      "strict_min_version": "121.0"
+    }
+  },
+  "icons": {
+    "16": "icon16.png",
+    "48": "icon48.png",
+    "128": "icon128.png"
+  },
+  "permissions": [
+    "activeTab",
+    "storage"
+  ],
+  "host_permissions": [
+    "http://127.0.0.1/*",
+    "http://localhost/*"
+  ],
+  "background": {
+    "scripts": ["background.js"]
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "*://*.chatgpt.com/*",
+        "*://gemini.google.com/*",
+        "*://*.claude.ai/*",
+        "*://*.claudemcpcontent.com/*",
+        "*://*.huggingface.co/*"
+      ],
+      "js": ["content.js"]
+    }
+  ],
+  "action": {
+    "default_popup": "popup.html",
+    "default_icon": {
+      "16": "icon16.png",
+      "48": "icon48.png",
+      "128": "icon128.png"
+    }
+  },
+  "web_accessible_resources": [
+    {
+      "resources": ["spoof.js"],
+      "matches": ["<all_urls>"]
+    }
+  ]
+}

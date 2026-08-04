@@ -1,4 +1,4 @@
-const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
+const isFirefox = chrome.runtime.getURL('').startsWith('moz-extension://');
 
 async function localFetch(url, options = {}) {
     if (!isFirefox) {
