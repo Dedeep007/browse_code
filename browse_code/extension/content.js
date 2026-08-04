@@ -1,17 +1,10 @@
-// Smart local fetch: Chrome content scripts bypass page CSP, but Firefox MV3
-// content scripts are subject to the page's CSP (which blocks localhost).
-// We try direct fetch first; if CSP blocks it, switch to background proxy permanently.
-let _useProxy = false;
+const isFirefox = navigator.userAgent.toLowerCase().includes('firefox');
 
 async function localFetch(url, options = {}) {
-    if (!_useProxy) {
-        try {
-            return await fetch(url, options);
-        } catch (e) {
-            console.log("[Browse Code] Direct fetch blocked (CSP), switching to background proxy");
-            _useProxy = true;
-        }
+    if (!isFirefox) {
+        return fetch(url, options);
     }
+    
     // Background proxy path (Firefox)
     return new Promise((resolve, reject) => {
         chrome.runtime.sendMessage({ type: 'bg_fetch', url, options }, (response) => {
