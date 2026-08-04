@@ -26,7 +26,8 @@ async def check_extension_connection():
         
         while True:
             if not is_extension_connected():
-                ext_path = str(Path.home() / ".browse_code" / "extension")
+                ext_chrome = str(Path.home() / ".browse_code" / "extension_chrome")
+                ext_firefox = str(Path.home() / ".browse_code" / "extension_firefox")
                 console.print()
                 console.print(
                     Panel(
@@ -42,12 +43,12 @@ async def check_extension_connection():
                         "    • Open chrome://extensions/ (or edge://extensions/)\n"
                         "    • Enable Developer Mode (top right)\n"
                         "    • Click Load unpacked and select this folder:\n"
-                        f"      [green]{ext_path}[/green]\n\n"
+                        f"      [green]{ext_chrome}[/green]\n\n"
                         "  [cyan]For Firefox:[/cyan]\n"
                         "    • Open about:debugging\n"
                         "    • Click 'This Firefox' on the left menu\n"
                         "    • Click 'Load Temporary Add-on' and select the manifest.json inside this folder:\n"
-                        f"      [green]{ext_path}[/green]",
+                        f"      [green]{ext_firefox}[/green]",
                         title="[bold yellow]Warning[/bold yellow]",
                         title_align="left",
                         border_style="yellow",
