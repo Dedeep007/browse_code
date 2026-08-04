@@ -89,7 +89,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function pollStatus() {
         chrome.storage.local.get(['serverKey'], (result) => {
-            if (!result.serverKey) return;
+            if (!result.serverKey) {
+                processList.innerHTML = '<div style="color: #ef4444;">No Server Key configured. Please paste it above and save.</div>';
+                return;
+            }
             fetch('http://localhost:5505/status', {
                 headers: { 'X-Server-Key': result.serverKey }
             })
