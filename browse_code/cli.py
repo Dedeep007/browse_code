@@ -100,13 +100,15 @@ def setup_extension():
         console.print("  [dim]Skipped. Re-run 'bc' anytime to set it up.[/dim]")
         return False
 
-    ext_path_str = str(ext_dest)
+    ext_chrome = data_dir / "extension_chrome"
+    ext_firefox = data_dir / "extension_firefox"
+
     console.print()
-    console.print(f"  [green]Extension ready at:[/green] [bold]{ext_path_str}[/bold]")
+    console.print("  [green]Extensions ready![/green]")
     console.print()
 
-    # Copy path to clipboard
-    copied = copy_to_clipboard(ext_path_str)
+    # Copy chrome path to clipboard by default
+    copied = copy_to_clipboard(str(ext_chrome))
 
     # Open chrome://extensions (for Chromium browsers)
     console.print("  [green]Opening extensions page (for Chrome/Edge)...[/green]")
@@ -126,13 +128,13 @@ def setup_extension():
     steps.add_row("1.", "Enable [bold]Developer mode[/bold] in the top right")
     steps.add_row(
         "2.",
-        f"Click [bold]Load unpacked[/bold] and select:\n[cyan]{ext_path_str}[/cyan]"
+        f"Click [bold]Load unpacked[/bold] and select this folder:\n[cyan]{ext_chrome}[/cyan]"
         + (" [dim](Copied!)[/dim]" if copied else ""),
     )
     steps.add_row("", "")
     steps.add_row("", "[cyan][bold]For Firefox:[/bold][/cyan]")
     steps.add_row("1.", "Open [bold]about:debugging[/bold] and click [bold]This Firefox[/bold]")
-    steps.add_row("2.", f"Click [bold]Load Temporary Add-on[/bold] and select [bold]manifest.json[/bold] inside:\n[cyan]{ext_path_str}[/cyan]")
+    steps.add_row("2.", f"Click [bold]Load Temporary Add-on[/bold] and select [bold]manifest.json[/bold] inside:\n[cyan]{ext_firefox}[/cyan]")
 
     console.print(
         Panel(
